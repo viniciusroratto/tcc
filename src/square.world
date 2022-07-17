@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+   <world name="default">
+      <include>
+         <uri>model://ground_plane</uri>
+      </include>
+      <include>
+         <uri>model://sun</uri>
+      </include>
+      
+      
+      
+      <actor name="animated_box">
+        <link name="box_link">
+          <visual name="visual">
+            <geometry>
+              <box>
+                <size>.2 .2 .2</size>
+              </box>
+            </geometry>
+          </visual>
+        </link>
+      </actor>
+
+
+      <actor name="animated_box2">
+        <link name="box_link2">
+          <visual name="visual">
+            <geometry>
+              <box>
+                <size>.4 .4 .4</size>
+              </box>
+            </geometry>
+          </visual>
+        </link>
+      </actor>
+      
+      
+   </world>
+</sdf>
+

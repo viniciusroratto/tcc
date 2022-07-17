@@ -1,0 +1,580 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+   <world name="default">
+   
+   
+      <include>
+         <uri>model://ground_plane</uri>
+      </include>
+      
+      
+      
+      <include>
+         <uri>model://sun</uri>
+      </include>
+      
+
+<!--
+<actor name="actor_0">
+  <visual>
+  <origin xyz = "0 0 0" />
+  </visual>
+  <skin>
+    <filename>stand.dae</filename>
+    <scale>1.0</scale>
+  </skin>
+</actor>
+-->
+
+        <model name="box_00">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        
+        <visual name="visual_01">	
+          <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+
+        
+        
+      </link>
+    </model>
+    
+    
+<model name="box_01">
+      <pose>1 0 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0.0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+             <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    
+<model name="box_02">
+      <pose>2 0 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+<model name="box_03">
+      <pose>3 0 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+<model name="box_04">
+      <pose>4 0 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    
+<model name="box_10">
+      <pose>0 1 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    
+<model name="box_11">
+      <pose>1 1 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+             <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+<model name="box_12">
+      <pose>2 1 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    
+<model name="box_13">
+      <pose>3 1 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    
+    
+<model name="box_14">
+      <pose>4 1 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+             <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    
+<model name="box_20">
+      <pose>0 2 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+             <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+<model name="box_21">
+      <pose>1 2 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+                  <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+<model name="box_22">
+      <pose>2 2 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+        
+<model name="box_23">
+      <pose>3 2 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+<model name="box_24">
+      <pose>4 2 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+        
+
+<model name="box_30">
+      <pose>0 3 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+<model name="box_31">
+      <pose>1 3 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>    
+    
+<model name="box_32">
+      <pose>2 3 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+<model name="box_33">
+      <pose>3 3 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+             <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+
+<model name="box_34">
+      <pose>4 3 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+        <material><ambient>0 0 0 1</ambient></material>
+          <geometry>
+            <box>
+              <size>1 1 5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+<model name="UAV_00">
+    <pose>0 0 5 0 0 0</pose>
+    <link name="link_00">
+    <gravity>0</gravity>
+      <pose>0 0 0 0 0 0</pose>
+      <collision name="collision_00">
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name="visual_00">
+      <material><ambient>0 0 1 1</ambient></material>
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </visual>
+    </link>
+</model>  
+     
+<model name="target_00">
+    <pose>0 -1 0 0 0 0</pose>
+    <link name="link_00">
+      <pose>0 0 0 0 0 0</pose>
+      <collision name="collision_00">
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name="visual_00">
+      <material><ambient>1 0 0 1</ambient></material>
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </visual>
+    </link>
+</model>    
+    
+    
+<model name="target_01">
+    <pose>0 -2 0 0 0 0</pose>
+    <link name="link_00">
+      <pose>0 0 0 0 0 0</pose>>
+      <collision name="collision_00">
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name="visual_00">
+	<material><ambient>1 0 0 1</ambient></material>
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </visual>
+    </link>
+</model>  
+
+<model name="target_02">
+    <pose>0 -3 0 0 0 0</pose>
+    <link name="link_00">
+     <pose>0 0 0 0 0 0</pose>
+      <collision name="collision_00">
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name="visual_00">
+        <material><ambient>1 0 0 1</ambient></material>
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry>
+      </visual>
+    </link>
+</model> 
+
+
+   </world>
+   
+
+   
+   
+</sdf>
+

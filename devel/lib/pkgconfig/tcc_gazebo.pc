@@ -1,0 +1,8 @@
+prefix=/home/vini/Desktop/tcc/devel
+
+Name: tcc_gazebo
+Description: Description of tcc_gazebo
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

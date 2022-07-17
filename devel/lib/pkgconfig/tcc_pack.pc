@@ -1,0 +1,8 @@
+prefix=/home/vini/Desktop/tcc/devel
+
+Name: tcc_pack
+Description: Description of tcc_pack
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

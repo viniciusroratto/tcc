@@ -1,0 +1,2 @@
+tcc_description:tcc_gazebo:tcc_pack
+-DCATKIN_DEVEL_PREFIX=/home/vini/Desktop/tcc/devel -DCMAKE_INSTALL_PREFIX=/home/vini/Desktop/tcc/install -G Unix Makefiles
