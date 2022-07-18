@@ -143,7 +143,7 @@
     </model>
     
     
-<model name="box_10">
+<model name="box_05">
       <pose>0 1 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -166,7 +166,7 @@
     </model>
     
     
-<model name="box_11">
+<model name="box_06">
       <pose>1 1 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -188,7 +188,7 @@
       </link>
     </model>
     
-<model name="box_12">
+<model name="box_07">
       <pose>2 1 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -211,7 +211,7 @@
     </model>
     
     
-<model name="box_13">
+<model name="box_08">
       <pose>3 1 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -235,7 +235,7 @@
     
     
     
-<model name="box_14">
+<model name="box_09">
       <pose>4 1 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -258,7 +258,7 @@
     </model>
     
     
-<model name="box_20">
+<model name="box_10">
       <pose>0 2 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -280,7 +280,7 @@
       </link>
     </model>
 
-<model name="box_21">
+<model name="box_11">
       <pose>1 2 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -302,7 +302,7 @@
       </link>
     </model>
 
-<model name="box_22">
+<model name="box_12">
       <pose>2 2 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -324,7 +324,7 @@
       </link>
     </model>
         
-<model name="box_23">
+<model name="box_13">
       <pose>3 2 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -346,7 +346,7 @@
       </link>
     </model>
 
-<model name="box_24">
+<model name="box_14">
       <pose>4 2 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -369,7 +369,7 @@
     </model>
         
 
-<model name="box_30">
+<model name="box_15">
       <pose>0 3 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -391,7 +391,7 @@
       </link>
     </model>
 
-<model name="box_31">
+<model name="box_16">
       <pose>1 3 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -413,7 +413,7 @@
       </link>
     </model>    
     
-<model name="box_32">
+<model name="box_17">
       <pose>2 3 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -435,7 +435,7 @@
       </link>
     </model>
 
-<model name="box_33">
+<model name="box_18">
       <pose>3 3 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
@@ -458,7 +458,7 @@
     </model>
 
 
-<model name="box_34">
+<model name="box_19">
       <pose>4 3 0.0 0 0 0</pose>
       <link name="link_01">
         <pose>0 0 0 0 0 0</pose>
