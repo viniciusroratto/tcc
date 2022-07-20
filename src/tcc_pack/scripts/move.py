@@ -43,8 +43,7 @@ def move(name, x,y,z):
         resp = set_state( state_msg )
 
     except rospy.ServiceException as e:
-        print ("Service call failed: %s" % e)
-        
+        print ("Service call failed: %s" % e)        
         
         
 def acelerate_to(name, speed_x, speed_y, speed_z):
@@ -59,16 +58,30 @@ def acelerate_to(name, speed_x, speed_y, speed_z):
 def callback(data):
     rospy.loginfo("%s",data.data)
 
-def init(blocks = False):
+def reset(blocks = 0):
     
-    if(blocks == False):
-        for each in boxes
+    for each in boxes:
+        x = randint(-world_size, world_size)
+        y = randint(-world_size, world_size)
+        move(each, x+blocks*world_size, y+blocks*world_size, 0)   
         
+        
+    for each in uavs:
+        x = randint(-world_size, world_size)
+        y = randint(-world_size, world_size)
+        move(each, x, y, 3)
+      
+      for each in targets:
+          x = randint(-world_size, world_size)
+          y = randint(-world_size, world_size)
+          move(each, x, y, 0)
 
 
 def main():
-    value = randint(-world_size, world_size)
-    print(value)
+
+    while True:
+    	time.sleep(3)
+        reset(0)
 
     #while True:
      #   time.sleep(1)
@@ -79,3 +92,8 @@ if __name__ == '__main__':
         main()
     except rospy.ROSInterruptException:
         print("Basic Main Error")
+    
+    
+    
+    
+    
