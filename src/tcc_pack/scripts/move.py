@@ -3,10 +3,11 @@ import rospkg
 from gazebo_msgs.msg import ModelState 
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import GetModelState
+from std_srvs.srv import Empty
 from std_msgs.msg import String
 from random import seed
 from random import randint, uniform
-
+import _thread
 import time
 
 models = ["UAV_00", 
@@ -19,11 +20,12 @@ models = ["UAV_00",
 uavs = list(filter(lambda k: 'UAV' in k, models))
 targets = list(filter(lambda k: 'target' in k, models))
 boxes = list(filter(lambda k: 'box' in k, models))
-world_size = 50
+world_size = 15
 target_max_speed = 1
 target_z = 0
 uav_max_speed = 20
 uav_z = 3
+
 
 
 def move(name, x,y,z):
@@ -52,9 +54,9 @@ def move(name, x,y,z):
         
 def acelerate_to(name, speed_x, speed_y, speed_z):
     model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
-    x = model_coordinates("UAV_00", "").pose.position.x
-    y = model_coordinates("UAV_00", "").pose.position.y
-    z = model_coordinates("UAV_00", "").pose.position.z
+    x = model_coordinates(name, "").pose.position.x
+    y = model_coordinates(name, "").pose.position.y
+    z = model_coordinates(name, "").pose.position.z
     move(name, x + speed_x , y + speed_y, z + speed_z)
     	
 
@@ -64,14 +66,13 @@ def callback(data):
 
 def reset(blocks = 0):
     
-   
     for each in boxes:
         if blocks == 1:
             x = randint(-world_size, world_size)
             y = randint(-world_size, world_size)
             move(each, x, y, 0)
         else:
-            move(each, world_size+1, world_size+1, 0)
+            move(each, world_size+100, world_size+100, 0)
         
         
     for each in uavs:
@@ -82,37 +83,62 @@ def reset(blocks = 0):
     for each in targets:
         x = randint(-world_size, world_size)
         y = randint(-world_size, world_size)
-        move(each, x, y, 0)
+        move(each, x, y, target_z)
 
 def targets_movement(targets):
 
 	model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
+	
+	speeds = []
 	
 	while True:
 		time.sleep(2)
 		for each in targets:
 			x = uniform(-target_max_speed, target_max_speed)
 			y = uniform(-target_max_speed, target_max_speed)
-        	
-			if(model_coordinates(each, "").pose.position.x <= world_size) and (model_coordinates(each, "").pose.position.y <= world_size):
-				acelerate_to(each, x, y, target_z)
+			speeds.append([x,y])
+        
+		for idx, each in enumerate(targets):
+        
+			if(abs(model_coordinates(each, "").pose.position.x) <= world_size and abs(model_coordinates(each, "").pose.position.y) <= world_size):
+			
+				acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+				
 			else:
-				if (model_coordinates(each, "").pose.position.x >= world_size):
-					acelerate_to(each, -x, y, target_z)
+				if (abs(model_coordinates(each, "").pose.position.x) >= world_size):
+					speeds[idx][0] = -speeds[idx][0]
+					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+					
 				else:
-					acelerate_to(each, x, -y, target_z)
+					speeds[idx][1] = -speeds[idx][1]
+					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
 	
 
 def main():
 
+	rospy.wait_for_service('/gazebo/reset_world')
+	reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
+	reset_world()
+	
+	time.sleep(2)
+
+
 	reset(0)
-	targets_movement(targets)
+	
+	try:
+		_thread.start_new_thread(targets_movement, (targets, ))
+		_thread.start_new_thread(targets_movement, (uavs, ))
+	except:
+		"Thread failed"
+	
 
 	
 		
 
 
-    #while True:
+	while True:
+		time.sleep(1)
+
      #   time.sleep(1)
      #  acelerate_to('UAV_00', -1, -1, 0)
 
