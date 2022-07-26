@@ -9,24 +9,28 @@ from random import seed
 from random import randint, uniform
 import _thread
 import time
-
-models = ["UAV_00", 
-          "target_00", "target_01", "target_02",
-          "box_00", "box_01", "box_02", "box_03", "box_04",
-          "box_05", "box_06", "box_07", "box_08", "box_09",
-          "box_10", "box_11", "box_12", "box_13", "box_14",
-          "box_15", "box_16", "box_17", "box_18", "box_19",]
-          
-uavs = list(filter(lambda k: 'UAV' in k, models))
-targets = list(filter(lambda k: 'target' in k, models))
-boxes = list(filter(lambda k: 'box' in k, models))
-world_size = 15
-target_max_speed = 1
-target_z = 0
-uav_max_speed = 20
-uav_z = 3
+import numpy as np
+from scipy import spatial
+import matplotlib.pyplot as plt
+import pandas as pd
+from functools import wraps
+from sko.ACA import ACA_TSP
+from sko.GA import GA_TSP
+from sko.tools import set_run_mode
+import math
 
 
+def timeit(func):
+    @wraps(func)
+    def timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        #print(f'Function {func.__name__}{args} {kwargs} Took {total_time:.4f} seconds')
+        print(f'Function {func.__name__} Took {total_time:.4f} seconds')
+        return result
+    return timeit_wrapper
 
 def move(name, x,y,z):
     rospy.init_node('set_pose')
@@ -59,12 +63,22 @@ def acelerate_to(name, speed_x, speed_y, speed_z):
     z = model_coordinates(name, "").pose.position.z
     move(name, x + speed_x , y + speed_y, z + speed_z)
     	
-
+def get_targets(targets, uav):
+	
+	targets = targets + [uav]
+	points = []
+	model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
+	for each in targets:
+		points.append([model_coordinates(each, "").pose.position.x, model_coordinates(each, "").pose.position.y])
+	return points
+	
 
 def callback(data):
     rospy.loginfo("%s",data.data)
 
-def reset(blocks = 0):
+def reset(blocks, boxes, uavs, targets, world_size):
+    target_z = 0
+    uav_z = 3
     
     for each in boxes:
         if blocks == 1:
@@ -78,7 +92,7 @@ def reset(blocks = 0):
     for each in uavs:
         x = randint(-world_size, world_size)
         y = randint(-world_size, world_size)
-        move(each, x, y, 3)
+        move(each, x, y, uav_z)
       
     for each in targets:
         x = randint(-world_size, world_size)
@@ -112,43 +126,137 @@ def targets_movement(targets):
 				else:
 					speeds[idx][1] = -speeds[idx][1]
 					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+					
+def cal_total_distance(routine) :
+	'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
+	num_points, = routine.shape
+	return sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
 	
+def get_distances(points):
+
+	points_coordinate = np.array(points)  # generate coordinate of points
+	distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
+	return distance_matrix, points_coordinate
+	
+	
+@timeit
+def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode):
+
+	# %% do GA
+	set_run_mode(cal_total_distance, mode) #('common', 'multithreading', 'multiprocessing')
+	ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop=size_pop, max_iter=max_iter, prob_mut=1)
+	best_points, best_distance = ga_tsp.run()
+
+	fig, ax = plt.subplots(1, 2)
+	best_points_ = np.concatenate([best_points, [best_points[0]]])
+	best_points_coordinate = points_coordinate[best_points_, :]
+	ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
+	ax[1].plot(ga_tsp.generation_best_Y)
+	plt.savefig("GA.jpg")
+
+
+	
+@timeit
+def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode):
+
+	# %% Do ACA
+	set_run_mode(cal_total_distance, mode) #('common', 'multithreading', 'multiprocessing')
+	aca = ACA_TSP(func=cal_total_distance, n_dim=num_points, size_pop=size_pop, max_iter=max_iter, distance_matrix=distance_matrix)
+	best_x, best_y = aca.run()
+
+	fig, ax = plt.subplots(1, 2)
+	best_points_ = np.concatenate([best_x, [best_x[0]]])
+	best_points_coordinate = points_coordinate[best_points_, :]
+	ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
+	pd.DataFrame(aca.y_best_history).cummin().plot(ax=ax[1])
+	plt.savefig("ACA.jpg")
+
+
+"""
+def auction (uavs, targets):
+	
+	target_list = targets
+	
+	for x,y in enumerate(uavs):
+		distances_list = []
+		for q in target_list:
+			distances_list.append(math.dist(uavs[x],q))
+		targets_dict = dict(zip(target_list, distances_list))
+			
+"""
+
+
+models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
+          "target_00", "target_01", "target_02", "target_03", "target_04",
+          "target_05", "target_06", "target_07", "target_08", "target_09", "target_10",
+          "target_11", "target_12", "target_13", "target_14", "target_15", "target_16",
+          "target_17", "target_18", "target_19", "target_20", "target_21", "target_22",
+          "target_23", "target_24",
+          "box_00", "box_01", "box_02", "box_03", "box_04",
+          "box_05", "box_06", "box_07", "box_08", "box_09",
+          "box_10", "box_11", "box_12", "box_13", "box_14",
+          "box_15", "box_16", "box_17", "box_18", "box_19"]
+ 
+uavs = list(filter(lambda k: 'UAV' in k, models))
+targets = list(filter(lambda k: 'target' in k, models))
+boxes = list(filter(lambda k: 'box' in k, models))         
+points = get_targets(targets, "UAV_00")          
+num_points = len(points)
+distance_matrix = np.empty(2,2)
+#distance_matrix, points_coordinate = get_distances(points)
+print(type(distance_matrix))
+
 
 def main():
 
-	rospy.wait_for_service('/gazebo/reset_world')
-	reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
-	reset_world()
+
+	world_size = 100
+	target_max_speed = 1
+	target_z = 0
+	uav_max_speed = 20
+	uav_z = 3
 	
-	time.sleep(2)
-
-
-	reset(0)
+	#targets_dict =
 	
-	try:
-		_thread.start_new_thread(targets_movement, (targets, ))
-		_thread.start_new_thread(targets_movement, (uavs, ))
-	except:
-		"Thread failed"
+	reset(0, boxes, uavs, targets, world_size)
+	
+	
+"""
+	for each uavs:
+		points = get_targets(targets, "UAV_00")
+		num_points = len(points)
+		distance_matrix, points_coordinate = get_distances(points)
+	
+		size_pop = 26
+		max_iter = 5
+		mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
+		genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode)
+		antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter), mode)
+	
+	#rospy.wait_for_service('/gazebo/reset_world')
+	#reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
+	#reset_world()
+	
+	#time.sleep(2)
+"""
+
+	
+	
+	#try:
+	#	_thread.start_new_thread(targets_movement, (targets, ))
+	#	_thread.start_new_thread(targets_movement, (uavs, ))
+	#except:
+		#print("Thread failed")
 	
 
-	
-		
 
-
-	while True:
-		time.sleep(1)
-
-     #   time.sleep(1)
-     #  acelerate_to('UAV_00', -1, -1, 0)
 
 if __name__ == '__main__':
     try:
         main()
     except rospy.ROSInterruptException:
         print("Basic Main Error")
-    
-    
-    
-    
-    
+        
+        
+        
+        

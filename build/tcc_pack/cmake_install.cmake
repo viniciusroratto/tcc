@@ -57,15 +57,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tcc_pack" TYPE PROGRAM FILES "/home/vini/Desktop/tcc/build/tcc_pack/catkin_generated/installspace/talker.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tcc_pack" TYPE PROGRAM FILES "/home/vini/Desktop/tcc/build/tcc_pack/catkin_generated/installspace/listener.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tcc_pack" TYPE PROGRAM FILES "/home/vini/Desktop/tcc/build/tcc_pack/catkin_generated/installspace/talker.py")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tcc_pack" TYPE PROGRAM FILES "/home/vini/Desktop/tcc/build/tcc_pack/catkin_generated/installspace/GA_TSP.py")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)

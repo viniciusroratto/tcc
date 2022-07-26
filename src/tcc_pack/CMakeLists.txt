@@ -206,16 +206,7 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-catkin_install_python(PROGRAMS scripts/talker.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-
-catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-catkin_install_python(PROGRAMS scripts/talker.py scripts/move.py
+catkin_install_python(PROGRAMS scripts/talker.py scripts/GA_TSP.py scripts/move.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

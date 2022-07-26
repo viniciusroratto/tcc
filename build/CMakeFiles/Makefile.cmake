@@ -25,7 +25,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/vini/Desktop/tcc/src/tcc_gazebo/scripts/talker.py"
   "/home/vini/Desktop/tcc/src/tcc_pack/CMakeLists.txt"
   "/home/vini/Desktop/tcc/src/tcc_pack/package.xml"
-  "/home/vini/Desktop/tcc/src/tcc_pack/scripts/listener.py"
+  "/home/vini/Desktop/tcc/src/tcc_pack/scripts/GA_TSP.py"
   "/home/vini/Desktop/tcc/src/tcc_pack/scripts/move.py"
   "/home/vini/Desktop/tcc/src/tcc_pack/scripts/talker.py"
   "/opt/ros/noetic/share/catkin/cmake/all.cmake"

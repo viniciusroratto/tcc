@@ -1,74 +1,154 @@
-#!/usr/bin/env python3
-import rospy
-from geometry_msgs.msg import Twist
-from turtlesim.msg import Pose
-import math
-import time
+import rospy 
+import rospkg 
+from gazebo_msgs.msg import ModelState 
+from gazebo_msgs.srv import SetModelState
+from gazebo_msgs.srv import GetModelState
 from std_srvs.srv import Empty
-x=0
-y=0
-z=0
-yaw=0
-def poseCallback(pose_message):
-    global x
-    global y, z, yaw
-    x= pose_message.x
-    y= pose_message.y
-    yaw = pose_message.theta
-    #print "pose callback"
-    #print ('x = {}'.format(pose_message.x)) #new in python 3
-    #print ('y = %f' %pose_message.y) #used in python 2
-    #print ('yaw = {}'.format(pose_message.theta)) #new in python 3
-def move(speed, distance):
-        #declare a Twist message to send velocity commands
-            velocity_message = Twist()
-            #get current location 
-            x0=x
-            y0=y
-            #z0=z;
-            #yaw0=yaw;
-            velocity_message.linear.x =speed
-            distance_moved = 0.0
-            loop_rate = rospy.Rate(10) # we publish the velocity at 10 Hz (10 times a second)    
-            cmd_vel_topic='/turtle1/cmd_vel'
-            velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
-            while True :
-                    rospy.loginfo("Turtlesim moves forwards")
-                    velocity_publisher.publish(velocity_message)
-                    loop_rate.sleep()
-                    
-                    #rospy.Duration(1.0)
-                    
-                    distance_moved = distance_moved+abs(0.5 * math.sqrt(((x-x0) ** 2) + ((y-y0) ** 2)))
-                    print  distance_moved               
-                    if  not (distance_moved<distance):
-                        rospy.loginfo("reached")
-                        break
-            
-            #finally, stop the robot when the distance is moved
-            velocity_message.linear.x =0
-            velocity_publisher.publish(velocity_message)
+from std_msgs.msg import String
+from random import seed
+from random import randint, uniform
+import _thread
+import time
+
+models = ["UAV_00", 
+          "target_00", "target_01", "target_02",
+          "box_00", "box_01", "box_02", "box_03", "box_04",
+          "box_05", "box_06", "box_07", "box_08", "box_09",
+          "box_10", "box_11", "box_12", "box_13", "box_14",
+          "box_15", "box_16", "box_17", "box_18", "box_19",]
+          
+uavs = list(filter(lambda k: 'UAV' in k, models))
+targets = list(filter(lambda k: 'target' in k, models))
+boxes = list(filter(lambda k: 'box' in k, models))
+world_size = 15
+target_max_speed = 1
+target_z = 0
+uav_max_speed = 20
+uav_z = 3
+
+
+
+def move(name, x,y,z):
+    rospy.init_node('set_pose')
+
+    state_msg = ModelState()
     
+    
+    state_msg.model_name = name
+    state_msg.pose.position.x = x
+    state_msg.pose.position.y = y
+    state_msg.pose.position.z = z
+    state_msg.pose.orientation.x = 0
+    state_msg.pose.orientation.y = 0
+    state_msg.pose.orientation.z = 0
+    state_msg.pose.orientation.w = 0
+
+    rospy.wait_for_service('/gazebo/set_model_state')
+    try:
+        set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+        resp = set_state( state_msg )
+
+    except rospy.ServiceException as e:
+        print ("Service call failed: %s" % e)        
+        
+        
+def acelerate_to(name, speed_x, speed_y, speed_z):
+    model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
+    x = model_coordinates(name, "").pose.position.x
+    y = model_coordinates(name, "").pose.position.y
+    z = model_coordinates(name, "").pose.position.z
+    move(name, x + speed_x , y + speed_y, z + speed_z)
+    	
+
+
+def callback(data):
+    rospy.loginfo("%s",data.data)
+
+def reset(blocks = 0):
+    
+    for each in boxes:
+        if blocks == 1:
+            x = randint(-world_size, world_size)
+            y = randint(-world_size, world_size)
+            move(each, x, y, 0)
+        else:
+            move(each, world_size+100, world_size+100, 0)
+        
+        
+    for each in uavs:
+        x = randint(-world_size, world_size)
+        y = randint(-world_size, world_size)
+        move(each, x, y, 3)
+      
+    for each in targets:
+        x = randint(-world_size, world_size)
+        y = randint(-world_size, world_size)
+        move(each, x, y, target_z)
+
+def targets_movement(targets):
+
+	model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
+	
+	speeds = []
+	
+	while True:
+		time.sleep(2)
+		for each in targets:
+			x = uniform(-target_max_speed, target_max_speed)
+			y = uniform(-target_max_speed, target_max_speed)
+			speeds.append([x,y])
+        
+		for idx, each in enumerate(targets):
+        
+			if(abs(model_coordinates(each, "").pose.position.x) <= world_size and abs(model_coordinates(each, "").pose.position.y) <= world_size):
+			
+				acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+				
+			else:
+				if (abs(model_coordinates(each, "").pose.position.x) >= world_size):
+					speeds[idx][0] = -speeds[idx][0]
+					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+					
+				else:
+					speeds[idx][1] = -speeds[idx][1]
+					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+	
+
+def main():
+
+	rospy.wait_for_service('/gazebo/reset_world')
+	reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
+	reset_world()
+	
+	time.sleep(2)
+
+
+	reset(0)
+	
+	try:
+		_thread.start_new_thread(targets_movement, (targets, ))
+		_thread.start_new_thread(targets_movement, (uavs, ))
+	except:
+		"Thread failed"
+	
+
+	
+		
+
+
+	while True:
+		time.sleep(1)
+
+     #   time.sleep(1)
+     #  acelerate_to('UAV_00', -1, -1, 0)
+
 if __name__ == '__main__':
     try:
-        
-        rospy.init_node('turtlesim_motion_pose', anonymous=True)
-        #declare velocity publisher
-        cmd_vel_topic='/turtle1/cmd_vel'
-        velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
-        
-        position_topic = "/turtle1/pose"
-        pose_subscriber = rospy.Subscriber(position_topic, Pose, poseCallback) 
-        time.sleep(2)
-        print 'move: '
-        move (1.0, 5.0)
-        time.sleep(2)
-        print 'start reset: '
-        rospy.wait_for_service('reset')
-        reset_turtle = rospy.ServiceProxy('reset', Empty)
-        reset_turtle()
-        print 'end reset: '
-        rospy.spin()
-       
+        main()
     except rospy.ROSInterruptException:
-        rospy.loginfo("node terminated.")
+        print("Basic Main Error")
+    
+    
+    
+    
+    
