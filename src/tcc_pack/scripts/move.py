@@ -18,6 +18,8 @@ from sko.ACA import ACA_TSP
 from sko.GA import GA_TSP
 from sko.tools import set_run_mode
 import math
+import os
+import glob
 
 
 def timeit(func):
@@ -63,9 +65,8 @@ def acelerate_to(name, speed_x, speed_y, speed_z):
     z = model_coordinates(name, "").pose.position.z
     move(name, x + speed_x , y + speed_y, z + speed_z)
     	
-def get_targets(targets, uav):
+def get_points(targets):
 	
-	targets = targets + [uav]
 	points = []
 	model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
 	for each in targets:
@@ -99,14 +100,14 @@ def reset(blocks, boxes, uavs, targets, world_size):
         y = randint(-world_size, world_size)
         move(each, x, y, target_z)
 
-def targets_movement(targets):
+def targets_movement(targets, target_max_speed, world_size, target_z):
 
 	model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
 	
 	speeds = []
 	
 	while True:
-		time.sleep(2)
+		time.sleep(1)
 		for each in targets:
 			x = uniform(-target_max_speed, target_max_speed)
 			y = uniform(-target_max_speed, target_max_speed)
@@ -127,20 +128,24 @@ def targets_movement(targets):
 					speeds[idx][1] = -speeds[idx][1]
 					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
 					
-def cal_total_distance(routine) :
-	'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
-	num_points, = routine.shape
-	return sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+
 	
 def get_distances(points):
-
-	points_coordinate = np.array(points)  # generate coordinate of points
+	points_coordinate = np.array(list(points.values()))
 	distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 	return distance_matrix, points_coordinate
 	
 	
 @timeit
-def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode):
+def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n):
+
+	def cal_total_distance(routine) :
+		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
+		num_points, = routine.shape
+		soma = sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+		print(soma)
+		return soma
+
 
 	# %% do GA
 	set_run_mode(cal_total_distance, mode) #('common', 'multithreading', 'multiprocessing')
@@ -152,12 +157,18 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	best_points_coordinate = points_coordinate[best_points_, :]
 	ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
 	ax[1].plot(ga_tsp.generation_best_Y)
-	plt.savefig("GA.jpg")
+	plt.savefig("./results/GA_" + str(n) + ".jpg")
 
 
 	
 @timeit
-def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode):
+def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n):
+
+	def cal_total_distance(routine) :
+		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
+		num_points, = routine.shape
+		soma = sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+		return soma
 
 	# %% Do ACA
 	set_run_mode(cal_total_distance, mode) #('common', 'multithreading', 'multiprocessing')
@@ -169,9 +180,14 @@ def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter
 	best_points_coordinate = points_coordinate[best_points_, :]
 	ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
 	pd.DataFrame(aca.y_best_history).cummin().plot(ax=ax[1])
-	plt.savefig("ACA.jpg")
+	plt.savefig("./results/ACA_" + str(n) + ".jpg")
 
 
+def clean_results ():
+	files = glob.glob('./results/*')
+	if len(files) > 0:
+		for f in files:
+			os.remove(f)
 """
 def auction (uavs, targets):
 	
@@ -199,54 +215,46 @@ models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
  
 uavs = list(filter(lambda k: 'UAV' in k, models))
 targets = list(filter(lambda k: 'target' in k, models))
-boxes = list(filter(lambda k: 'box' in k, models))         
-points = get_targets(targets, "UAV_00")          
-num_points = len(points)
-distance_matrix = np.empty(2,2)
-#distance_matrix, points_coordinate = get_distances(points)
-print(type(distance_matrix))
+boxes = list(filter(lambda k: 'box' in k, models))   
+
+
+      
 
 
 def main():
-
-
+	
+	clean_results()
+	uav_dict = dict(zip(uavs, get_points(uavs)))
+	targets_dict = dict(zip(targets, get_points(targets)))
+	
 	world_size = 100
 	target_max_speed = 1
 	target_z = 0
 	uav_max_speed = 20
 	uav_z = 3
 	
-	#targets_dict =
-	
 	reset(0, boxes, uavs, targets, world_size)
-	
-	
-"""
-	for each uavs:
-		points = get_targets(targets, "UAV_00")
-		num_points = len(points)
-		distance_matrix, points_coordinate = get_distances(points)
-	
-		size_pop = 26
-		max_iter = 5
-		mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
-		genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode)
-		antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter), mode)
-	
-	#rospy.wait_for_service('/gazebo/reset_world')
-	#reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
-	#reset_world()
-	
-	#time.sleep(2)
-"""
 
+	size_pop = 26
+	max_iter = 100
+	mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
 	
-	
-	#try:
-	#	_thread.start_new_thread(targets_movement, (targets, ))
-	#	_thread.start_new_thread(targets_movement, (uavs, ))
-	#except:
-		#print("Thread failed")
+
+	_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z ))
+
+		
+	n = 0	
+	while n < 20:
+		n = n + 1
+		targets_dict = dict(zip(targets, get_points(targets)))
+		uav_dict.update(targets_dict)
+		num_points = len(uav_dict)
+		distance_matrix, points_coordinate = get_distances(uav_dict)
+		genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n)
+		antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n)
+		print(n)
+		time.sleep(5)
+
 	
 
 
@@ -257,6 +265,4 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException:
         print("Basic Main Error")
         
-        
-        
-        
+       
