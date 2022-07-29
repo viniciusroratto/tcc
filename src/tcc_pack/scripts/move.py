@@ -131,19 +131,18 @@ def targets_movement(targets, target_max_speed, world_size, target_z):
 
 	
 def get_distances(points):
-	points_coordinate = np.array(list(points.values()))
+	points_coordinate = np.array(list(points))
 	distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 	return distance_matrix, points_coordinate
 	
 	
 @timeit
-def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n):
+def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n,x):
 
 	def cal_total_distance(routine) :
 		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
 		num_points, = routine.shape
 		soma = sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
-		print(soma)
 		return soma
 
 
@@ -153,16 +152,19 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	best_points, best_distance = ga_tsp.run()
 
 	fig, ax = plt.subplots(1, 2)
+	plt.title(x + " " + str(n).zfill(2)  + ' = ' + str(int(min(ga_tsp.generation_best_Y))), loc='left')
 	best_points_ = np.concatenate([best_points, [best_points[0]]])
 	best_points_coordinate = points_coordinate[best_points_, :]
 	ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
 	ax[1].plot(ga_tsp.generation_best_Y)
-	plt.savefig("./results/GA_" + str(n) + ".jpg")
+	plt.savefig("./results/GA_" + str(x)+ "_" + str(n).zfill(2)  + ".jpg")
+	plt.close('all')
+	print(x, n, min(ga_tsp.generation_best_Y))
 
 
 	
 @timeit
-def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n):
+def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x):
 
 	def cal_total_distance(routine) :
 		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
@@ -176,11 +178,14 @@ def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter
 	best_x, best_y = aca.run()
 
 	fig, ax = plt.subplots(1, 2)
+	plt.title(x + " " + str(n).zfill(2)  + ' = ' + str(int(min(aca.y_best_history))), loc='left')
 	best_points_ = np.concatenate([best_x, [best_x[0]]])
 	best_points_coordinate = points_coordinate[best_points_, :]
 	ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
 	pd.DataFrame(aca.y_best_history).cummin().plot(ax=ax[1])
-	plt.savefig("./results/ACA_" + str(n) + ".jpg")
+	plt.savefig("./results/ACA_" + str(x) + "_" + str(n).zfill(2)  + ".jpg")
+	plt.close('all')
+	print(x, n, min(aca.y_best_history))
 
 
 def clean_results ():
@@ -188,18 +193,32 @@ def clean_results ():
 	if len(files) > 0:
 		for f in files:
 			os.remove(f)
-"""
-def auction (uavs, targets):
+
+def first_auction ():
 	
-	target_list = targets
+	target_list = get_points(targets)
+	uav_list = get_points(uavs)
 	
-	for x,y in enumerate(uavs):
-		distances_list = []
-		for q in target_list:
-			distances_list.append(math.dist(uavs[x],q))
-		targets_dict = dict(zip(target_list, distances_list))
+	auctioned = []
+	for each in uavs:
+		auctioned.append([])
+		
+	for xi, x in enumerate(targets):
+		values = []
+		for yi, y in enumerate(uav_list):
+			values.append(1 / ((math.sqrt(((y[0]-target_list[xi][0])**2) + (y[1]-target_list[xi][1])**2 ) * 0.1*(len(auctioned[yi]) + 1))))
+		#print(x, values)
+		index = values.index(max(values))
+		auctioned[index].append(target_list[xi])
+	
+	nums = []	
+	for each in auctioned:
+		nums.append(len(each))
 			
-"""
+	print(nums)
+	return auctioned
+			
+
 
 
 models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
@@ -220,7 +239,7 @@ boxes = list(filter(lambda k: 'box' in k, models))
 
       
 
-
+@timeit
 def main():
 	
 	clean_results()
@@ -228,7 +247,7 @@ def main():
 	targets_dict = dict(zip(targets, get_points(targets)))
 	
 	world_size = 100
-	target_max_speed = 1
+	target_max_speed = 2
 	target_z = 0
 	uav_max_speed = 20
 	uav_z = 3
@@ -240,20 +259,21 @@ def main():
 	mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
 	
 
-	_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z ))
+	_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z))
 
-		
+	auctioned_targets = first_auction()	
 	n = 0	
 	while n < 20:
+		
 		n = n + 1
-		targets_dict = dict(zip(targets, get_points(targets)))
-		uav_dict.update(targets_dict)
-		num_points = len(uav_dict)
-		distance_matrix, points_coordinate = get_distances(uav_dict)
-		genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n)
-		antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n)
-		print(n)
-		time.sleep(5)
+		for xi, x in enumerate(uavs):
+		
+			num_points = len(auctioned_targets[xi])
+				
+			distance_matrix, points_coordinate = get_distances(auctioned_targets[xi])
+			genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x)
+			antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter/10), mode, n, x)
+		auctioned_targets = first_auction()
 
 	
 
