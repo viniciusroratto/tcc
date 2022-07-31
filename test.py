@@ -22,12 +22,11 @@ ant_df = pd.DataFrame(columns = ['size_pop', 'max_iter', 'best_distance', 'time'
 sm_df = pd.DataFrame(columns = ['T_max', 'T_min', 'L', 'best_distance', 'time'])
 im_df = pd.DataFrame(columns = ['size_pop', 'max_iter', 'prob_mut', 'T', 'alpha',  'best_distance', 'time'])
 
-'''
+
 genalg_df.to_csv("./results/0_genalg.csv", index= False)
 ant_df.to_csv("./results/0_ant.csv", index= False)
 sm_df.to_csv("./results/0_sm.csv", index= False)
 im_df.to_csv("./results/0_im.csv", index= False)
-'''
 
 
 
@@ -44,7 +43,7 @@ def genalg(genalg_df, size_pop = 50, max_iter = 500, prob_mut = 1):
 	end = time.time()
 	run = end - begin
 	
-	new_row = {'size_pop': size_pop, 'max_iter':max_iter, 'prob_mut':prob_mut, 'best_distance':best_distance, 'time':run}
+	new_row = {'size_pop': size_pop, 'max_iter':max_iter, 'prob_mut':prob_mut, 'best_distance':best_distance[0], 'time':run}
 	genalg_df = genalg_df.append(new_row, ignore_index=True)
 	genalg_df.to_csv("./results/0_genalg.csv", mode='a', header=False, index= False)
 
@@ -86,7 +85,7 @@ def immune(im_df, size_pop=500, max_iter=800, prob_mut=0.2, T=0.7, alpha=0.95):
 	end = time.time()
 	run = end - begin
 	
-	new_row = {'size_pop': size_pop, 'max_iter':max_iter, 'prob_mut': prob_mut, 'T':T, 'alpha': alpha, 'best_distance':best_distance, 'time':run}
+	new_row = {'size_pop': size_pop, 'max_iter':max_iter, 'prob_mut': prob_mut, 'T':T, 'alpha': alpha, 'best_distance':best_distance[0], 'time':run}
 	sm_df = im_df.append(new_row, ignore_index=True)
 	sm_df.to_csv("./results/0_im.csv", mode='a', header=False, index= False)
 
@@ -120,7 +119,6 @@ for x in range(100):
 				print("T_max: ", T_max)
 				print("T_min: ", T_min)
 				print("L: ", L)
-				#sim_anealing(sm_df, T_max=100, T_min=1, L=10)
 				sim_anealing(sm_df, T_max, T_min, L)
 				os.system('cls' if os.name == 'nt' else 'clear')
 				
@@ -132,9 +130,9 @@ for x in range(100):
 						print("Immune Algorithm", x)
 						print("size_pop: ", size_pop)
 						print("max_iter: ", max_iter)
+						print("prob_mut: ", prob_mut)
 						print("T: ", T)
 						print("alpha: ", alpha)
-						#immune(im_df, size_pop=500, max_iter=800, prob_mut=0.2, T=0.7, alpha=0.95)
 						immune(im_df, size_pop, max_iter, prob_mut, T, alpha)
 						os.system('cls' if os.name == 'nt' else 'clear') 
 
