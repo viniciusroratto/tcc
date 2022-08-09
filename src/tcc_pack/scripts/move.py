@@ -21,6 +21,25 @@ import math
 import os
 import glob
 
+models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
+          "target_00", "target_01", "target_02", "target_03", "target_04",
+          "target_05", "target_06", "target_07", "target_08", "target_09", "target_10",
+          "target_11", "target_12", "target_13", "target_14", "target_15", "target_16",
+          "target_17", "target_18", "target_19", "target_20", "target_21", "target_22",
+          "target_23", "target_24",
+          "box_00", "box_01", "box_02", "box_03", "box_04",
+          "box_05", "box_06", "box_07", "box_08", "box_09",
+          "box_10", "box_11", "box_12", "box_13", "box_14",
+          "box_15", "box_16", "box_17", "box_18", "box_19"]
+ 
+uavs = list(filter(lambda k: 'UAV' in k, models))
+targets = list(filter(lambda k: 'target' in k, models))
+boxes = list(filter(lambda k: 'box' in k, models))   
+
+
+time_table = pd.DataFrame(columns = targets)
+time_table.to_csv('./distances.csv', index = False)
+
 
 def timeit(func):
     @wraps(func)
@@ -103,18 +122,21 @@ def reset(blocks, boxes, uavs, targets, world_size):
 def targets_movement(targets, target_max_speed, world_size, target_z):
 
 	model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
-	
 	speeds = []
 	
 	while True:
+		model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
+		
 		time.sleep(1)
 		for each in targets:
 			x = uniform(-target_max_speed, target_max_speed)
 			y = uniform(-target_max_speed, target_max_speed)
 			speeds.append([x,y])
         
+		distance_list = []
 		for idx, each in enumerate(targets):
-        
+			distance_list.append(smaller_distance(each, uavs))
+        	
 			if(abs(model_coordinates(each, "").pose.position.x) <= world_size and abs(model_coordinates(each, "").pose.position.y) <= world_size):
 			
 				acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
@@ -127,6 +149,11 @@ def targets_movement(targets, target_max_speed, world_size, target_z):
 				else:
 					speeds[idx][1] = -speeds[idx][1]
 					acelerate_to(each, speeds[idx][0], speeds[idx][1], target_z)
+		print("distance_list: ", distance_list, flush = True)
+		distance_dict = dict(zip(targets, distance_list))
+		df = time_table.append(distance_dict, ignore_index = True)
+		df.to_csv('./distances.csv', mode='a', header=False, index= False )		
+		
 					
 
 	
@@ -143,7 +170,6 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
 		num_points, = routine.shape
 		soma = sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
-		return soma
 
 
 	# %% do GA
@@ -165,6 +191,11 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	
 @timeit
 def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x):
+
+
+	uav_points = get_points([x])
+	points_coordinate = np.concatenate([points_coordinate, np.array(list(uav_points))])
+	
 
 	def cal_total_distance(routine) :
 		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
@@ -207,7 +238,6 @@ def first_auction ():
 		values = []
 		for yi, y in enumerate(uav_list):
 			values.append(1 / ((math.sqrt(((y[0]-target_list[xi][0])**2) + (y[1]-target_list[xi][1])**2 ) * 0.1*(len(auctioned[yi]) + 1))))
-		#print(x, values)
 		index = values.index(max(values))
 		auctioned[index].append(target_list[xi])
 	
@@ -215,26 +245,26 @@ def first_auction ():
 	for each in auctioned:
 		nums.append(len(each))
 			
-	print(nums)
 	return auctioned
 			
+def smaller_distance(target, uavs):
+
+	uav_points = get_points(uavs)
+	target_list = []
+	target_list.append(target)
+	target_points = get_points(target_list)[0]
+	
+	for each in uav_points:
+		distances = []
+		distances.append(((math.sqrt(((target_points[0]-each[0])**2) + (target_points[1]-each[1])**2 ))))
+
+	smaller_distance = min(distances)
+	return smaller_distance
+		
+		
 
 
 
-models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
-          "target_00", "target_01", "target_02", "target_03", "target_04",
-          "target_05", "target_06", "target_07", "target_08", "target_09", "target_10",
-          "target_11", "target_12", "target_13", "target_14", "target_15", "target_16",
-          "target_17", "target_18", "target_19", "target_20", "target_21", "target_22",
-          "target_23", "target_24",
-          "box_00", "box_01", "box_02", "box_03", "box_04",
-          "box_05", "box_06", "box_07", "box_08", "box_09",
-          "box_10", "box_11", "box_12", "box_13", "box_14",
-          "box_15", "box_16", "box_17", "box_18", "box_19"]
- 
-uavs = list(filter(lambda k: 'UAV' in k, models))
-targets = list(filter(lambda k: 'target' in k, models))
-boxes = list(filter(lambda k: 'box' in k, models))   
 
 
       
@@ -244,7 +274,7 @@ def main():
 	
 	clean_results()
 	uav_dict = dict(zip(uavs, get_points(uavs)))
-	targets_dict = dict(zip(targets, get_points(targets)))
+	#targets_dict = dict(zip(targets, get_points([targets])))
 	
 	world_size = 100
 	target_max_speed = 2
@@ -263,7 +293,7 @@ def main():
 
 	auctioned_targets = first_auction()	
 	n = 0	
-	while n < 20:
+	while n < 100:
 		
 		n = n + 1
 		for xi, x in enumerate(uavs):
@@ -271,8 +301,8 @@ def main():
 			num_points = len(auctioned_targets[xi])
 				
 			distance_matrix, points_coordinate = get_distances(auctioned_targets[xi])
-			genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x)
-			antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter/10), mode, n, x)
+			#genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x)
+			#antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter/10), mode, n, x)
 		auctioned_targets = first_auction()
 
 	
