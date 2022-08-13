@@ -9,3 +9,5 @@ rosnode kill -a
 pkill roslaunch
 convert -delay 40 -loop 0 ./results/*.jpg sequence.gif
 #rosservice call /gazebo/reset_world
+#rosservice call /gazebo/get_world_properties "{}"
+

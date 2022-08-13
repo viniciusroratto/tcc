@@ -1,2 +1,2 @@
-tcc_description:tcc_gazebo:tcc_pack
+gazebo_ros_pkgs/gazebo_dev:gazebo_ros_pkgs/gazebo_msgs:gazebo_ros_pkgs/gazebo_plugins:gazebo_ros_pkgs/gazebo_ros:gazebo_ros_pkgs/gazebo_ros_control:gazebo_ros_pkgs/gazebo_ros_pkgs:tcc_description:tcc_gazebo:tcc_pack
 -DCATKIN_DEVEL_PREFIX=/home/vini/Desktop/tcc/devel -DCMAKE_INSTALL_PREFIX=/home/vini/Desktop/tcc/install -G Unix Makefiles

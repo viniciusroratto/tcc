@@ -94,8 +94,8 @@ def immune(im_df, size_pop=500, max_iter=800, prob_mut=0.2, T=0.7, alpha=0.95):
 
 for x in range(100):
 	
-	for size_pop in [6, 10, 26, 50, 100, 250, 500, 1000]:
-		for max_iter in [5, 10, 25, 50, 100, 250, 500, 1000]:
+	for size_pop in [6, 10, 26, 50, 100, 250]:
+		for max_iter in [5, 10, 25, 50, 100, 250]:
 			for prob_mut in [0.001, 0.0025, 0.01, 0.1, 0.25, 0.5, 1]:
 				print("Genetic Algorithm", x)
 				print("size_pop: ", size_pop)
@@ -104,8 +104,8 @@ for x in range(100):
 				genalg(genalg_df,size_pop, max_iter, prob_mut)
 				os.system('cls' if os.name == 'nt' else 'clear') 
 
-	for size_pop in [6, 10, 26, 50, 100, 250, 500, 1000]:
-		for max_iter in [5, 10, 25, 50, 100, 250, 500, 1000]:
+	for size_pop in [6, 10, 26, 50, 100, 250]:
+		for max_iter in [5, 10, 25, 50, 100, 250]:
 			print("Ant Colony", x)
 			print("size_pop: ", size_pop)
 			print("max_iter: ", max_iter)
@@ -114,7 +114,7 @@ for x in range(100):
 
 	for T_max in [6, 10, 26, 50, 100, 250, 500, 1000]:
 		for T_min in [1, -10, -25, -50, -100, -250, -500, -1000]:
-			for L in [5, 10, 25, 50, 100, 250, 500, 1000]:
+			for L in [5, 10, 25, 50, 100, 250]:
 				print("Simmuleate Annealing", x)
 				print("T_max: ", T_max)
 				print("T_min: ", T_min)
@@ -122,8 +122,8 @@ for x in range(100):
 				sim_anealing(sm_df, T_max, T_min, L)
 				os.system('cls' if os.name == 'nt' else 'clear')
 				
-	for size_pop in [6, 10, 26, 50, 100, 250, 500, 1000]:
-		for max_iter in [5, 10, 25, 50, 100, 250, 500, 1000]:
+	for size_pop in [6, 10, 26, 50, 100, 250]:
+		for max_iter in [5, 10, 25, 50, 100, 250]:
 			for prob_mut in [0.001, 0.0025, 0.01, 0.1, 0.25, 0.5, 0.75, 1]:
 				for T in [0.001, 0.0025, 0.01, 0.1, 0.25, 0.5, 0.75, 1]:
 					for alpha in [0.001, 0.0025, 0.01, 0.1, 0.25, 0.5, 1]:
