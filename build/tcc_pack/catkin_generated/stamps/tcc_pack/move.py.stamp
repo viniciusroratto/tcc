@@ -1,6 +1,8 @@
 import rospy 
 import rospkg 
 from gazebo_msgs.msg import ModelState 
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Point, Twist
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import GetModelState
 from std_srvs.srv import Empty
@@ -18,8 +20,15 @@ from sko.ACA import ACA_TSP
 from sko.GA import GA_TSP
 from sko.tools import set_run_mode
 import math
+from tf.transformations import euler_from_quaternion
+from math import atan2
 import os
 import glob
+
+
+
+
+
 
 models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
           "target_00", "target_01", "target_02", "target_03", "target_04",
@@ -159,7 +168,6 @@ def get_distances(points):
 	distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 	return distance_matrix, points_coordinate
 	
-	
 @timeit
 def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n,x):
 
@@ -167,6 +175,7 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
 		num_points, = routine.shape
 		soma = sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
+		return soma
 
 
 	# %% do GA
@@ -174,6 +183,7 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	ga_tsp = GA_TSP(func=cal_total_distance, n_dim=num_points, size_pop=size_pop, max_iter=max_iter, prob_mut=1)
 	best_points, best_distance = ga_tsp.run()
 
+	'''
 	fig, ax = plt.subplots(1, 2)
 	plt.title(x + " " + str(n).zfill(2)  + ' = ' + str(int(min(ga_tsp.generation_best_Y))), loc='left')
 	best_points_ = np.concatenate([best_points, [best_points[0]]])
@@ -182,6 +192,7 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	ax[1].plot(ga_tsp.generation_best_Y)
 	plt.savefig("./results/GA_" + str(x)+ "_" + str(n).zfill(2)  + ".jpg")
 	plt.close('all')
+	'''
 	print(x, n, min(ga_tsp.generation_best_Y))
 
 
@@ -205,6 +216,7 @@ def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter
 	aca = ACA_TSP(func=cal_total_distance, n_dim=num_points, size_pop=size_pop, max_iter=max_iter, distance_matrix=distance_matrix)
 	best_x, best_y = aca.run()
 
+	'''
 	fig, ax = plt.subplots(1, 2)
 	plt.title(x + " " + str(n).zfill(2)  + ' = ' + str(int(min(aca.y_best_history))), loc='left')
 	best_points_ = np.concatenate([best_x, [best_x[0]]])
@@ -213,6 +225,7 @@ def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter
 	pd.DataFrame(aca.y_best_history).cummin().plot(ax=ax[1])
 	plt.savefig("./results/ACA_" + str(x) + "_" + str(n).zfill(2)  + ".jpg")
 	plt.close('all')
+	'''
 	print(x, n, min(aca.y_best_history))
 
 
@@ -282,12 +295,54 @@ def monitor_distances(targets, uavs):
 			rospy.sleep(0.01)
 			tock = rospy.get_time()
 			
+def move_uav():
+	x = 0.0
+	y = 0.0 
+	theta = 0.0
+
+	def newOdom(msg, x, y, theta):
+
+		x = msg.pose.pose.position.x
+		y = msg.pose.pose.position.y
+
+		rot_q = msg.pose.pose.orientation
+		(roll, pitch, theta) = euler_from_quaternion([rot_q.x, rot_q.y, rot_q.z, rot_q.w])
+
+	rospy.init_node("speed_controller")
+
+	sub = rospy.Subscriber("/odometry/filtered", Odometry, newOdom)
+	pub = rospy.Publisher("/cmd_vel", Twist, queue_size = 1)
+
+	speed = Twist()
+
+	r = rospy.Rate(4)
+
+	goal = Point()
+	goal.x = 5
+	goal.y = 5
+
+	while not rospy.is_shutdown():
+		inc_x = goal.x -x
+		inc_y = goal.y -y
+
+		angle_to_goal = atan2(inc_y, inc_x)
+
+		if abs(angle_to_goal - theta) > 0.1:
+		    speed.linear.x = 0.0
+		    speed.angular.z = 0.3
+		else:
+		    speed.linear.x = 0.5
+		    speed.angular.z = 0.0
+
+		pub.publish(speed)
+		r.sleep()  
 
 
-
-@timeit
 def main():
+
+	move_uav()
 	
+	algo = 1
 	clean_results()
 	uav_dict = dict(zip(uavs, get_points(uavs)))
 	#targets_dict = dict(zip(targets, get_points([targets])))
@@ -305,8 +360,8 @@ def main():
 	mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
 	
 
-	_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z))
-	_thread.start_new_thread(monitor_distances, (targets, uavs))
+	#_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z))
+	#_thread.start_new_thread(monitor_distances, (targets, uavs))
 
 	auctioned_targets = first_auction()	
 	n = 0	
@@ -318,8 +373,11 @@ def main():
 			num_points = len(auctioned_targets[xi])
 				
 			distance_matrix, points_coordinate = get_distances(auctioned_targets[xi])
-			#genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x)
-			#antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter/10), mode, n, x)
+			
+			if(algo == 0):
+				genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x)
+			if(algo == 1):
+				antcolony(num_points, distance_matrix, points_coordinate, size_pop, int(max_iter), mode, n, x)
 		auctioned_targets = first_auction()
 
 	

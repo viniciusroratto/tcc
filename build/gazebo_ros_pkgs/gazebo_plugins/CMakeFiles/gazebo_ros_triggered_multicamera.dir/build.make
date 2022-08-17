@@ -102,7 +102,6 @@ gazebo_ros_triggered_multicamera_EXTERNAL_OBJECTS =
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libprotobuf.so
-/home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreMain.so
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreTerrain.so
@@ -130,7 +129,6 @@ gazebo_ros_triggered_multicamera_EXTERNAL_OBJECTS =
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libprotobuf.so
-/home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreMain.so
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreTerrain.so
@@ -269,7 +267,8 @@ gazebo_ros_triggered_multicamera_EXTERNAL_OBJECTS =
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libsdformat9.so.9.7.0
-/home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreMain.so
+/home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreTerrain.so
+/home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgrePaging.so
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgreTerrain.so
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libOgrePaging.so
 /home/vini/Desktop/tcc/devel/lib/libgazebo_ros_triggered_multicamera.so: /usr/lib/x86_64-linux-gnu/libignition-transport8.so.8.2.1

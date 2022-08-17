@@ -471,7 +471,7 @@
     </model>
     
 <model name="UAV_00">
-    <pose>0 0 5 0 0 0</pose>
+    <pose>0 0 20 0 0 0</pose>
     <link name="link_00">
     <gravity>0</gravity>
       <pose>0 0 0 0 0 0</pose>
@@ -491,20 +491,17 @@
         </geometry>
       </visual>
     </link>
-    
-  <gazebo>
     <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
+      <commandTopic>cmd_vel_UAV_00</commandTopic>
+      <odometryTopic>odom_UAV_00</odometryTopic>
+      <odometryFrame>odom_UAV_00</odometryFrame>
       <odometryRate>20.0</odometryRate>
       <robotBaseFrame>base_footprint</robotBaseFrame>
     </plugin>
-  </gazebo>
 </model>  
 
 <model name="UAV_01">
-    <pose>1 1 5 0 0 0</pose>
+    <pose>10 10 20 0 0 0</pose>
     <link name="link_00">
     <gravity>0</gravity>
       <pose>0 0 0 0 0 0</pose>
@@ -523,23 +520,18 @@
           </sphere>
         </geometry>
       </visual>
-    </link>
-    
-
-  <gazebo>
-    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
+    </link> 
+        <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+      <commandTopic>cmd_vel_UAV_01</commandTopic>
+      <odometryTopic>odom_UAV_01</odometryTopic>
+      <odometryFrame>odom_UAV_01</odometryFrame>
       <odometryRate>20.0</odometryRate>
       <robotBaseFrame>base_footprint</robotBaseFrame>
-    </plugin>
-  </gazebo>    
-
+    </plugin> 
 </model> 
 
 <model name="UAV_02">
-    <pose>2 2 5 0 0 0</pose>
+    <pose>30 30 20 0 0 0</pose>
     <link name="link_00">
     <gravity>0</gravity>
       <pose>0 0 0 0 0 0</pose>
@@ -559,10 +551,17 @@
         </geometry>
       </visual>
     </link>
+    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+      <commandTopic>cmd_vel_UAV_02</commandTopic>
+      <odometryTopic>odom_UAV_02</odometryTopic>
+      <odometryFrame>odom_UAV_02</odometryFrame>
+      <odometryRate>20.0</odometryRate>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
 </model> 
 
 <model name="UAV_03">
-    <pose>3 3 5 0 0 0</pose>
+    <pose>40 40 20 0 0 0</pose>
     <link name="link_00">
     <gravity>0</gravity>
       <pose>0 0 0 0 0 0</pose>
@@ -582,10 +581,17 @@
         </geometry>
       </visual>
     </link>
+    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+      <commandTopic>cmd_vel_UAV_03</commandTopic>
+      <odometryTopic>odom_UAV_03</odometryTopic>
+      <odometryFrame>odom_UAV_03</odometryFrame>
+      <odometryRate>20.0</odometryRate>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
 </model> 
 
 <model name="UAV_04">
-    <pose>4 4 5 0 0 0</pose>
+    <pose>50 50 20 0 0 0</pose>
     <link name="link_00">
     <gravity>0</gravity>
       <pose>0 0 0 0 0 0</pose>
@@ -605,6 +611,13 @@
         </geometry>
       </visual>
     </link>
+    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+      <commandTopic>cmd_vel_UAV_04</commandTopic>
+      <odometryTopic>odom_UAV_04</odometryTopic>
+      <odometryFrame>odom_UAV_04</odometryFrame>
+      <odometryRate>20.0</odometryRate>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
 </model> 
      
 <model name="target_00">
