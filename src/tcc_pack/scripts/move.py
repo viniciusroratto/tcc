@@ -89,7 +89,7 @@ def move(name, x,y,z):
     except rospy.ServiceException as e:
         print ("Service call failed: %s" % e)    
             
-@timeit        
+#@timeit        
 def acelerate_to(name, speed_x, speed_y, speed_z):
     model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
     x = model_coordinates(name, "").pose.position.x
@@ -166,15 +166,19 @@ def targets_movement(targets, target_max_speed, world_size, target_z):
 
 	
 def get_distances(points):
-	points_coordinate = np.array(list(points))
+	points_coordinate = np.array(points)
+	#print(points_coordinate, type(points_coordinate))
 	distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 	return distance_matrix, points_coordinate
 	
 @timeit
-def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n,x):
+def genalg(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
-	uav_points = get_points([x])
-	points_coordinate = np.concatenate([points_coordinate, np.array(list(uav_points))])
+	uav_points = get_points([x])[0]
+	targets.append(uav_points)
+	distance_matrix, points_coordinate = get_distances(targets)
+	
+	#points_coordinate = np.concatenate([points_coordinate, np.array(list(uav_points))])
 	
 	def cal_total_distance(routine) :
 		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
@@ -189,6 +193,9 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	best_points, best_distance = ga_tsp.run()
 	best_points_ = np.concatenate([best_points, [best_points[0]]])
 	best_points_coordinate = points_coordinate[best_points_, :]
+	
+	while uav_points != list(best_points_coordinate[0]):
+		best_points_coordinate.append(best_points_coordinate.pop(0))
 
 	'''
 	fig, ax = plt.subplots(1, 2)
@@ -198,24 +205,27 @@ def genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, m
 	plt.savefig("./results/GA_" + str(x)+ "_" + str(n).zfill(2)  + ".jpg")
 	plt.close('all')
 	'''
-	print(x, n, best_distance)
+	#print(x, best_distance)
 	return best_points_coordinate, best_distance
 
 
 	
 @timeit
-def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x):
+def antcolony(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
-
-	uav_points = get_points([x])
-	points_coordinate = np.concatenate([points_coordinate, np.array(list(uav_points))])
+	uav_points = get_points([x])[0]
+	targets.append(uav_points)
 	
+	
+	distance_matrix, points_coordinate = get_distances(targets)
+	num_points = len(points_coordinate)
+	
+	#print(distance_matrix, points_coordinate)
 
-	def cal_total_distance(routine) :
-		'''The objective function. input routine, return total distance. cal_total_distance(np.arange(num_points)) '''
+
+	def cal_total_distance(routine):
 		num_points, = routine.shape
-		soma = sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
-		return soma
+		return sum([distance_matrix[routine[i % num_points], routine[(i + 1) % num_points]] for i in range(num_points)])
 
 	# %% Do ACA
 	set_run_mode(cal_total_distance, mode) #('common', 'multithreading', 'multiprocessing')
@@ -223,9 +233,12 @@ def antcolony(num_points, distance_matrix, points_coordinate, size_pop, max_iter
 	best_x, best_y = aca.run()
 	
 	best_points_ = np.concatenate([best_x, [best_x[0]]])
-	best_points_coordinate = points_coordinate[best_points_, :]
+	best_points_coordinate = list(points_coordinate[best_points_, :])
 	
-	print(x, n, best_y)
+	while uav_points != list(best_points_coordinate[0]):
+		best_points_coordinate.append(best_points_coordinate.pop(0))
+	
+	#print(x, best_y)
 	return best_points_coordinate, best_y
 	'''
 	fig, ax = plt.subplots(1, 2)
@@ -262,7 +275,7 @@ def first_auction (auctioned):
 	nums = []	
 	for each in auctioned:
 		nums.append(len(each))
-			
+	print(nums)		
 	return auctioned
 			
 def smaller_distance(target, uavs):
@@ -331,7 +344,7 @@ def uav_move(goal_x, goal_y, uav):
 	
 	
 	rospy.wait_for_message("/odom_" + uav, Odometry)
-	r = rospy.Rate(20)
+	r = rospy.Rate(2)
 
 	goal = Point()
 	goal.x = goal_x
@@ -346,19 +359,30 @@ def uav_move(goal_x, goal_y, uav):
 		inc_y = goal.y -y
 
 		angle_to_goal = atan2(inc_y, inc_x)
-
-		if abs(angle_to_goal - theta) > 0.3:
+		
+		if (angle_to_goal - theta) > 0:
+			multi = 1
+		else:
+			multi = -1
+			
+		if abs(angle_to_goal - theta) > 0.2:
 			speed.linear.x = 0.0
 			speed.linear.y = 0.0
-			speed.angular.z = 0.3
+			#kp = 1
+			#target_rad = angle_to_goal*math.pi/180
+			speed.angular.z = multi*abs(angle_to_goal - theta)/2
+			
+
 		else:
 		    speed.linear.x = sp
 		    speed.linear.y = 0.0
 		    speed.angular.z = 0.0
+			
+
 
 		pub.publish(speed)
 		distance = math.sqrt(((goal.x - x)**2) + (y - goal.y)**2 )
-		print(uav, [goal_x, goal_y], distance, abs(angle_to_goal - theta), sp)
+		#print(uav, [goal_x, goal_y], distance, angle_to_goal - theta, sp)
 		
 		if distance < sp:
 			sp = sp/2
@@ -368,12 +392,37 @@ def uav_move(goal_x, goal_y, uav):
 	speed.linear.y = 0.0
 	speed.angular.z = 0.0
 	pub.publish(speed)
+	
+	
+def fly(targets, x, algo):	
+	size_pop = 26
+	max_iter = 10
+	mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
+	global auctioned_targets
+			
+	while True:
+		num_points = len(targets)	
+		distance_matrix, points_coordinate = get_distances(targets)
+
+		if(algo == 0):
+			points, distance = genalg(num_points, targets, points_coordinate, size_pop, max_iter, mode, x)
+		if(algo == 1):
+			points, distance = antcolony(num_points, targets, points_coordinate, size_pop, int(max_iter), mode, x)
+					
+		if distance < 1000:
+			tick = rospy.get_time()
+			for each in points[1:]:
+				print(x, each)
+				uav_move(each[0], each[1], x)
+			tock = rospy.get_time()
+			print(x, str(tock-tick), distance)
+		else:
+			print('UEPA!!!!')
+			#auctioned_targets = first_auction(targets)
 
 def main():
-
 	
-	
-	algo = 0
+	algo = 1
 	clean_results()
 	uav_dict = dict(zip(uavs, get_points(uavs)))
 	#targets_dict = dict(zip(targets, get_points([targets])))
@@ -386,47 +435,22 @@ def main():
 	
 	reset(0, boxes, uavs, targets, world_size)
 
-	'''
-	print(uavs)
-	for each in uavs:
-		print(each)
-		uav_move(0.0, 0.0, each)
-	'''
-	
-	size_pop = 26
-	max_iter = 100
-	mode = 'common' #('common', 'multithreading', 'multiprocessing', 'vectorization', 'cached')
 	
 
 	#_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z))
 	#_thread.start_new_thread(monitor_distances, (targets, uavs))
 
 	global auctioned_targets 
-	auctioned_targets = first_auction(auctioned_targets)	
-	n = 0	
-	while n < 2:
-		
-		n = n + 1
-		for xi, x in enumerate(uavs):
-		
-			num_points = len(auctioned_targets[xi])
-				
-			distance_matrix, points_coordinate = get_distances(auctioned_targets[xi])
-			
-			if(algo == 0):
-				points, distance = genalg(num_points, distance_matrix, points_coordinate, size_pop, max_iter, mode, n, x)
-			if(algo == 1):
-				points, distance = antcolony(num_points, distance_matrix, points_coordinate, int(size_pop/10), int(max_iter), mode, n, x)
-			
-			if distance < 400:
-				for each in points:
-					uav_move(each[0], each[1], x)
-			else:
-				auctioned_targets = first_auction(auctioned_targets)
+	auctioned_targets = first_auction(auctioned_targets)
+	for xi, x in enumerate(uavs):
+		#fly(auctioned_targets[xi], x, algo)
+		_thread.start_new_thread(fly, (auctioned_targets[xi], x, algo))
 
-
-	
-
+	tick = rospy.get_time()
+	tock = rospy.get_time()
+	while tock - tick < 300:
+		#time.sleep(5)
+		tock = rospy.get_time()
 
 
 if __name__ == '__main__':
