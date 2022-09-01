@@ -437,8 +437,8 @@ def main():
 
 	
 
-	#_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z))
-	#_thread.start_new_thread(monitor_distances, (targets, uavs))
+	_thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z))
+	_thread.start_new_thread(monitor_distances, (targets, uavs))
 
 	global auctioned_targets 
 	auctioned_targets = first_auction(auctioned_targets)
