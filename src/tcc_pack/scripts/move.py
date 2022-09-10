@@ -672,7 +672,7 @@ def main():
 	
 	global visits_table
 	global time_table
-	algo = 0
+	algo = 1
 	handover = False
 	prediction = False
 	push = False
@@ -694,7 +694,10 @@ def main():
 		print('Environment Error')
 
 	global auctioned_targets 
+	
 	auctioned_targets = first_auction(auctioned_targets)
+	while (len(auctioned_targets[0]) <= 1 and len(auctioned_targets[1]) <= 1 and len(auctioned_targets[2]) <= 1 and  len(auctioned_targets[3]) <= 1 and len(auctioned_targets[4]) <= 1):
+		auctioned_targets = first_auction(auctioned_targets)
 	
 	
 	
