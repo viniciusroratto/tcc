@@ -672,6 +672,7 @@ def main():
 	
 	global visits_table
 	global time_table
+	global auctioned_targets
 	algo = 1
 	handover = False
 	prediction = False
@@ -696,7 +697,9 @@ def main():
 	global auctioned_targets 
 	
 	auctioned_targets = first_auction(auctioned_targets)
-	while (len(auctioned_targets[0]) <= 1 and len(auctioned_targets[1]) <= 1 and len(auctioned_targets[2]) <= 1 and  len(auctioned_targets[3]) <= 1 and len(auctioned_targets[4]) <= 1):
+	while (len(auctioned_targets[0]) <= 1 or len(auctioned_targets[1]) <= 1 or len(auctioned_targets[2]) <= 1 or  len(auctioned_targets[3]) <= 1 or len(auctioned_targets[4]) <= 1):
+		reset(0, boxes, uavs, targets, world_size)
+		auctioned_targets = [[],[],[],[],[]]
 		auctioned_targets = first_auction(auctioned_targets)
 	
 	
