@@ -31,12 +31,13 @@ import threading
 
 
 for x in range(100):
-	try:
-		os.system('clear')
-		print(x)
-		os.system('rosrun tcc_pack move.py')
-	except:
-		print('terminou')
+	for each in [0,1,2,3]:
+		try:
+			os.system('clear')
+			print(x, each, datetime.now())
+			os.system('rosrun tcc_pack move.py ' + str(each))
+		except:
+			print('terminou')
 
  
 

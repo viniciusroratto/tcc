@@ -28,7 +28,7 @@ from datetime import datetime
 from sko.SA import SA_TSP
 from sko.IA import IA_TSP
 import threading
-
+import sys
 
 
 
@@ -99,17 +99,25 @@ def general_auction():
 				target = x[0]
 				zi = x[1]
 				
-				target_speed = np.linalg.norm(np.array(speeds[xi]))
+				position = targets.index(target)
+				
+				target_speed = np.linalg.norm(np.array(speeds[position]))
 						
 				for yi, y in enumerate(uav_list):	
 					#print(yi, zi)					
 					if yi != zi:
-						values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + (y[1]-target_list[xi][1])**2 ) + 25 *(len(auctioned_targets[yi]) + 0.01))))
+						values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
 					else:
-						values.append(-1)
+						values.append(0)
 				#print(values)
 				index = values.index(max(values))
 				auctioned_targets[index].append(target)
+				
+				
+				nums = []	
+				for each in auctioned_targets:
+					nums.append(len(each))
+				print(nums)
 			
 				waiting_list = []			
 				sem.release()
@@ -128,29 +136,32 @@ def timeit(func):
     return timeit_wrapper
 
 def turn(name ,x,y,z, roll, pitch, yaw):
-    rospy.init_node('set_pose')
 
-    state_msg = ModelState()
-    
-    state_msg.model_name = name
-    state_msg.pose.position.x = x
-    state_msg.pose.position.y = y
-    state_msg.pose.position.z = z
-    
-    [xo,yo, zo, wo ] = quaternion_from_euler(roll, pitch, yaw)
-    
-    state_msg.pose.orientation.x = xo
-    state_msg.pose.orientation.y = yo
-    state_msg.pose.orientation.z = zo
-    state_msg.pose.orientation.w = wo
+	try:
+		rospy.init_node('set_pose')
 
-    rospy.wait_for_service('/gazebo/set_model_state')
-    try:
-        set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-        resp = set_state( state_msg )
+		state_msg = ModelState()
+	except:
+		print('Set Pose - Turn')
+    
+	state_msg.model_name = name
+	state_msg.pose.position.x = x
+	state_msg.pose.position.y = y
+	state_msg.pose.position.z = z
+    
+	[xo,yo, zo, wo ] = quaternion_from_euler(roll, pitch, yaw)
+    
+	state_msg.pose.orientation.x = xo
+	state_msg.pose.orientation.y = yo
+	state_msg.pose.orientation.z = zo
+	state_msg.pose.orientation.w = wo
 
-    except rospy.ServiceException as e:
-        print ("Service call failed: %s" % e)
+	try:
+		rospy.wait_for_service('/gazebo/set_model_state')
+		set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+		resp = set_state( state_msg )
+	except rospy.ServiceException as e:
+		print ("Service call failed: %s" % e)
 
 '''        
 def turn_to(name, speed_z):
@@ -340,7 +351,7 @@ def sa(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 	return best_points_coordinate, best_distance
 
 	
-#@timeit
+@timeit
 def genalg(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 	uav_points = get_points([x])[0]
@@ -419,7 +430,7 @@ def first_auction (auctioned):
 		
 		for yi, y in enumerate(uav_list):
 			values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + 
-					(y[1]-target_list[xi][1])**2 ) + 25 *(len(auctioned[yi]) + 0.01))))
+					(y[1]-target_list[xi][1])**2 ) + 1 + 25 *(len(auctioned[yi])))))
 		index = values.index(max(values))
 		auctioned[index].append(targets[xi])
 	
@@ -491,17 +502,24 @@ def uav_move(goal_x, goal_y, uav):
 
 		rot_q = msg.pose.pose.orientation
 		(roll, pitch, yaw) = euler_from_quaternion([rot_q.x, rot_q.y, rot_q.z, rot_q.w]) #rad
-
-	sub = rospy.Subscriber("/odom_" + uav, Odometry, newOdom)
-	pub = rospy.Publisher("/cmd_vel_" + uav, Twist, queue_size = 1)
+	
+	try:
+		sub = rospy.Subscriber("/odom_" + uav, Odometry, newOdom)
+		pub = rospy.Publisher("/cmd_vel_" + uav, Twist, queue_size = 1)
+	except:
+		print('Publishing Error')
 
 	speed = Twist()
 	speed.linear.x = 0
 	speed.linear.y = 0
-	pub.publish(speed)
+	
+	try:
+		pub.publish(speed)
+		rospy.wait_for_message("/odom_" + uav, Odometry)
+	except:
+		print('Publishing Error')	
 	
 	
-	rospy.wait_for_message("/odom_" + uav, Odometry)
 	r = rospy.Rate(20)
 
 	goal = Point()
@@ -532,8 +550,10 @@ def uav_move(goal_x, goal_y, uav):
 		    speed.angular.z = 0.0
 			
 
-
-		pub.publish(speed)
+		try:
+			pub.publish(speed)
+		except:
+			print('Publishing Error')
 		
 		distance = math.sqrt(((goal.x - x)**2) + (y - goal.y)**2 )
 		#print(uav, [goal.x, goal.y], distance, int(yaw - angle_to_goal) )
@@ -545,7 +565,11 @@ def uav_move(goal_x, goal_y, uav):
 	speed.linear.x = 0.0
 	speed.linear.y = 0.0
 	speed.angular.z = 0.0
-	pub.publish(speed)
+	
+	try:
+		pub.publish(speed)
+	except:
+		print('Publishing Error')
 
 def get_offset(target_list, index, tick):
 	target_name = target_list[index]
@@ -582,7 +606,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 	run_algo = True
 	auctioned_targets_updated = auctioned_targets[xi]
 	t1 = rospy.get_time()
-	r = rospy.Rate(1)
+	#r = rospy.Rate(1)
 			
 	while not rospy.is_shutdown():
 	
@@ -592,7 +616,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 			t1 = rospy.get_time()
 			
 	
-		if(run_algo == True):
+		if(run_algo == True and not len(auctioned_targets_updated)==0):
 		
 			#print(auctioned_targets[xi])
 			target_names = auctioned_targets_updated
@@ -610,14 +634,16 @@ def fly(xi, x, algo, tick, delivery, prediction):
 			if(algo == 3):
 				points, distance = ia(num_points, targets_points, points_coordinate, size_pop, int(max_iter), mode, x)
 				
-			run_algo = True
-		
+			run_algo = False
 		
 		target_list = []
-		for each in points[1:]:
-			position = targets_points.index(list(each))
-			#print(position, each, targets_points)
-			target_list.append(target_names[position])
+		if (len(auctioned_targets_updated)==0):
+			auctioned_targets_updated.append(get_random_points())
+		else:
+			for each in points[1:]:
+				position = targets_points.index(list(each))
+				#print(position, each, targets_points)
+				target_list.append(target_names[position])
 		
 		last_target = target_list[-1]
 		
@@ -644,7 +670,8 @@ def fly(xi, x, algo, tick, delivery, prediction):
 			tock = rospy.get_time()
 			#print(x, str(2*distance/(tock-tick)))
 		else:
-			if distance < 500 or (distance > 500 and rospy.get_time() - t1 < 10):
+	
+			if distance < 600 or (distance > 600 and rospy.get_time() - t1 < 10):
 				#print(distance, 'no auction', rospy.get_time() - t1)
 				for index, alvo in enumerate(final_points):
 					#print(int(alvo[0]), int(alvo[1]))
@@ -658,10 +685,14 @@ def fly(xi, x, algo, tick, delivery, prediction):
 				tock = rospy.get_time()
 				#print(x, str(2*distance/(tock-tick)))
 			else:
+				print('entrou')
 				run_algo = True
 				sem.acquire()
+				#print(auctioned_targets[xi])
+				t1 = rospy.get_time()
 				auctioned_targets[xi].remove(last_target)
 				waiting_list.append((last_target, xi))
+				#print(auctioned_targets[xi])
 				sem.release()
 				
 				
@@ -669,13 +700,15 @@ def fly(xi, x, algo, tick, delivery, prediction):
 				
 
 def main():
+
+	print(sys.argv[0])
 	
 	global visits_table
 	global time_table
 	global auctioned_targets
-	algo = 1
-	handover = False
-	prediction = False
+	algo = int(sys.argv[1])
+	handover = True
+	prediction = True
 	push = False
 	
 	uav_dict = dict(zip(uavs, get_points(uavs)))
@@ -698,6 +731,7 @@ def main():
 	
 	auctioned_targets = first_auction(auctioned_targets)
 	while (len(auctioned_targets[0]) <= 1 or len(auctioned_targets[1]) <= 1 or len(auctioned_targets[2]) <= 1 or  len(auctioned_targets[3]) <= 1 or len(auctioned_targets[4]) <= 1):
+		
 		reset(0, boxes, uavs, targets, world_size)
 		auctioned_targets = [[],[],[],[],[]]
 		auctioned_targets = first_auction(auctioned_targets)
@@ -720,7 +754,7 @@ def main():
 			print('Flight Over!')
 		
 		
-	rospy.sleep(960)
+	rospy.sleep(20)
 	print('this is the end')
 	
 	
@@ -747,8 +781,8 @@ def main():
 	visits_table = visits_table.append(final_visits_dict, ignore_index = True)
 	time_table = time_table.append(final_time_dict, ignore_index = True)
 	
-	visits_table.to_csv('./results/visits.csv', index = False, mode = 'a', header = False)
-	time_table.to_csv('./results/time.csv', index = False, mode = 'a', header = False)
+	visits_table.to_csv('./results/visits'+ str(algo) + '.csv', index = False, mode = 'a', header = False)
+	time_table.to_csv('./results/time' + str(algo) + '.csv', index = False, mode = 'a', header = False)
 	print('Test Over')
 		
 	
