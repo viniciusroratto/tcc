@@ -607,7 +607,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 	auctioned_targets_updated = auctioned_targets[xi]
 	t1 = rospy.get_time()
 	#r = rospy.Rate(1)
-	limit = 50
+	limit = 300
 			
 	while not rospy.is_shutdown():
 	
