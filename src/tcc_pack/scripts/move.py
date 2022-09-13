@@ -106,7 +106,7 @@ def general_auction():
 				for yi, y in enumerate(uav_list):	
 					#print(yi, zi)					
 					if yi != zi:
-						values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
+						values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + 1 + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
 					else:
 						values.append(0)
 				#print(values)
@@ -351,7 +351,7 @@ def sa(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 	return best_points_coordinate, best_distance
 
 	
-@timeit
+#@timeit
 def genalg(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 	uav_points = get_points([x])[0]
@@ -607,6 +607,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 	auctioned_targets_updated = auctioned_targets[xi]
 	t1 = rospy.get_time()
 	#r = rospy.Rate(1)
+	limit = 50
 			
 	while not rospy.is_shutdown():
 	
@@ -638,18 +639,21 @@ def fly(xi, x, algo, tick, delivery, prediction):
 		
 		target_list = []
 		if (len(auctioned_targets_updated)==0):
-			auctioned_targets_updated.append(get_random_points())
+			target_list.append(get_random_points())
+			target_list.append(get_random_points())
+			target_list.append(get_random_points())
 		else:
 			for each in points[1:]:
 				position = targets_points.index(list(each))
 				#print(position, each, targets_points)
 				target_list.append(target_names[position])
+				last_target = target_list[0]
 		
-		last_target = target_list[-1]
-		
-		reverse = target_list[:-1]
-		reverse.reverse()
-		target_list.extend(reverse)
+			last_target = target_list[-1]
+			
+			reverse = target_list[:-1]
+			reverse.reverse()
+			target_list.extend(reverse)
 		
 		final_points = []
 		for each in target_list:
@@ -665,14 +669,16 @@ def fly(xi, x, algo, tick, delivery, prediction):
 										
 				else:
 					uav_move(alvo[0], alvo[1], x)
-				send_data(target_list[index], index, tick)
+					
+				if(auctioned_targets[xi] != 0):
+					send_data(target_list[index], index, tick)
 				
 			tock = rospy.get_time()
 			#print(x, str(2*distance/(tock-tick)))
 		else:
 	
-			if distance < 600 or (distance > 600 and rospy.get_time() - t1 < 10):
-				#print(distance, 'no auction', rospy.get_time() - t1)
+			if distance < limit or (distance > limit and rospy.get_time() - t1 < 10) or len(auctioned_targets_updated) <= 2:
+				#print(distance, rospy.get_time() - t1)
 				for index, alvo in enumerate(final_points):
 					#print(int(alvo[0]), int(alvo[1]))
 					if(prediction == True):				
@@ -680,7 +686,8 @@ def fly(xi, x, algo, tick, delivery, prediction):
 						uav_move(alvo[0] + offsetx, alvo[1] + offsety, x)
 					else:
 						uav_move(alvo[0], alvo[1], x)	
-					send_data(target_list[index], index, tick)
+					if(auctioned_targets[xi] != 0):
+						send_data(target_list[index], index, tick)
 					
 				tock = rospy.get_time()
 				#print(x, str(2*distance/(tock-tick)))
@@ -701,7 +708,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 
 def main():
 
-	print(sys.argv[0])
+	#print(sys.argv[0])
 	
 	global visits_table
 	global time_table
@@ -710,6 +717,8 @@ def main():
 	handover = True
 	prediction = True
 	push = False
+	
+
 	
 	uav_dict = dict(zip(uavs, get_points(uavs)))
 	#targets_dict = dict(zip(targets, get_points([targets])))
@@ -754,7 +763,7 @@ def main():
 			print('Flight Over!')
 		
 		
-	rospy.sleep(20)
+	rospy.sleep(960)
 	print('this is the end')
 	
 	
