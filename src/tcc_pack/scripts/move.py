@@ -716,7 +716,7 @@ def main():
 	algo = int(sys.argv[1])
 	handover = True
 	prediction = True
-	push = False
+	push = True
 	
 
 	
