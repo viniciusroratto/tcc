@@ -262,7 +262,7 @@ def targets_movement(targets, target_max_speed, world_size, target_z, push):
 		if (push == True and (tock - tick) > 20):
 			tick = rospy.get_time()
 			
-			for each, index in enumerate(targets):
+			for index, each in enumerate(targets):
 				xi = uniform(-0.5, 0.5)
 				yi = uniform(-0.5, 0.5)
 				speeds[index][0] = speeds[index][0] + xi
