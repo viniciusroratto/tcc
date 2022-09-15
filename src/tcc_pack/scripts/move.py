@@ -341,7 +341,7 @@ def sa(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 		return soma
 
 	set_run_mode(cal_total_distance, mode) #('common', 'multithreading', 'multiprocessing')
-	sa_tsp = SA_TSP(func=cal_total_distance, x0=range(num_points), T_max=100, T_min=1, L=10 * num_points)
+	sa_tsp = SA_TSP(func=cal_total_distance, x0=range(num_points), T_max=250, T_min=50, L=5)
 	best_points, best_distance = sa_tsp.run()
 	best_points_coordinate = list(points_coordinate[best_points, :])
 	
@@ -635,7 +635,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 			if(algo == 3):
 				points, distance = ia(num_points, targets_points, points_coordinate, size_pop, int(max_iter), mode, x)
 				
-			run_algo = False
+			run_algo = True
 		
 		target_list = []
 		if (len(auctioned_targets_updated)==0):
@@ -714,9 +714,9 @@ def main():
 	global time_table
 	global auctioned_targets
 	algo = int(sys.argv[1])
-	handover = True
-	prediction = True
-	push = True
+	handover = False
+	prediction = False
+	push = False
 	
 
 	
