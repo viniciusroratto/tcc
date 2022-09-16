@@ -95,7 +95,7 @@ for each in dirs:
 	'std_visit' : visit_values[1], 'std_time':time_values[1], 'err_visits':visit_values[2], 'err_time':time_values[2]}, ignore_index = True)
 print(df)	
 	
-df.to_csv('./final_results')
+df.to_csv('./final_results.csv')
 	
 	
 
