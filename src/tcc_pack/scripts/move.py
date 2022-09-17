@@ -37,7 +37,8 @@ models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
           "target_00", "target_01", "target_02", "target_03", "target_04",
           "target_05", "target_06", "target_07", "target_08", "target_09", "target_10",
           "target_11", "target_12", "target_13", "target_14", "target_15", "target_16",
-          "target_17", "target_18", "target_19",
+          "target_17", "target_18", "target_19", "target_20", "target_21", "target_22",
+          "target_23", "target_24",
           "box_00", "box_01", "box_02", "box_03", "box_04",
           "box_05", "box_06", "box_07", "box_08", "box_09",
           "box_10", "box_11", "box_12", "box_13", "box_14",
@@ -83,6 +84,7 @@ def general_auction():
 	r = rospy.Rate(1)
 	
 	while True:
+
 	
 		if len(waiting_list) > 0:
 			sem.acquire()
@@ -121,6 +123,7 @@ def general_auction():
 			
 				waiting_list = []			
 				sem.release()
+		r.sleep()
 
 
 def timeit(func):
@@ -169,7 +172,7 @@ def turn_to(name, speed_z):
     z = model_coordinates(name, "").pose.orientation.z
     turn(name, z + speed_z)
 '''
-
+#@timeit
 def move(name, x,y,z):
     rospy.init_node('set_pose')
 
@@ -285,7 +288,7 @@ def targets_movement(targets, target_max_speed, world_size, target_z, push):
 		
 		except:
 			print('failure getting coordinates')
-					
+		r.sleep()			
 
 	
 def get_distances(points):
@@ -294,7 +297,7 @@ def get_distances(points):
 	distance_matrix = spatial.distance.cdist(points_coordinate, points_coordinate, metric='euclidean')
 	return distance_matrix, points_coordinate
 
-#@timeit
+@timeit
 def ia(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 	uav_points = get_points([x])[0]
@@ -323,7 +326,7 @@ def ia(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 
 
-#@timeit
+@timeit
 def sa(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 	uav_points = get_points([x])[0]
@@ -351,7 +354,7 @@ def sa(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 	return best_points_coordinate, best_distance
 
 	
-#@timeit
+@timeit
 def genalg(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 	uav_points = get_points([x])[0]
@@ -383,7 +386,7 @@ def genalg(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 
 	
-#@timeit
+@timeit
 def antcolony(num_points, targets, points_coordinate, size_pop, max_iter, mode, x):
 
 	uav_points = get_points([x])[0]
@@ -476,7 +479,7 @@ def monitor_distances(targets, uavs, ts):
 		df = time_table.append(distance_dict, ignore_index = True)
 		df.to_csv('./results/distances_'+ str(ts) + '.csv', mode='a', header=False, index= False )
 		tock = rospy.get_time()
-		
+		r.sleep()
 
 
 def uav_move(goal_x, goal_y, uav):
@@ -531,7 +534,7 @@ def uav_move(goal_x, goal_y, uav):
 	speed.linear.x = 0.0
 	speed.angular.z = 0.0
 
-	while (distance > 10):
+	while (distance > 5):
 		
 		#rospy.Subscriber("/odom_" + uav, Odometry, newOdom)
 		inc_x = goal.x -x
@@ -545,7 +548,7 @@ def uav_move(goal_x, goal_y, uav):
 			turn(uav,x,y,z, roll, pitch, angle_to_goal)
 
 		else:
-		    speed.linear.x = 20
+		    speed.linear.x = sp
 		    speed.linear.y = 0.0
 		    speed.angular.z = 0.0
 			
@@ -571,14 +574,27 @@ def uav_move(goal_x, goal_y, uav):
 	except:
 		print('Publishing Error')
 
-def get_offset(target_list, index, tick):
+def get_distance(x,y,x1,y1):
+	arraya = np.array((x,y))
+	arrayb = np.array((x1,y1))
+	return np.linalg.norm(arraya-arrayb)
+
+def get_offset(target_list, index, tick, x):
 	target_name = target_list[index]
 	speed_index = targets.index(target_name)
 	xv = speeds[speed_index][0]
 	yv = speeds[speed_index][1]
+	
+	uav_points = get_points([x])[0]
+	target_points = get_points([target_name])[0]
+	
+	dist = get_distance(uav_points[0], uav_points[1], target_points[0], target_points[1])
+	extra_time = dist/20
+
 	tock = rospy.get_time()
-	offsetx = (tock-tick) * xv
-	offsety = (tock-tick) * yv
+	offsetx = ((tock-tick) + extra_time) * xv
+	offsety = ((tock-tick) + extra_time) * yv
+	
 	return offsetx, offsety	
 	
 def send_data(target, index, tick):
@@ -594,6 +610,7 @@ def get_random_points():
 	x = randint(-world_size, world_size)
 	y = randint(-world_size, world_size)
 	return [x,y]
+
 
 	
 	
@@ -636,6 +653,8 @@ def fly(xi, x, algo, tick, delivery, prediction):
 				points, distance = ia(num_points, targets_points, points_coordinate, size_pop, int(max_iter), mode, x)
 				
 			run_algo = True
+			
+		time = rospy.get_time()
 		
 		target_list = []
 		if (len(auctioned_targets_updated)==0):
@@ -664,29 +683,47 @@ def fly(xi, x, algo, tick, delivery, prediction):
 			for index, alvo in enumerate(final_points):
 				#print(int(alvo[0]), int(alvo[1]))
 				if(prediction == True):				
-					offsetx, offsety = get_offset(target_list, index, tick)
-					uav_move(alvo[0] + offsetx, alvo[1] + offsety, x)
+					offsetx, offsety = get_offset(target_list, index, time,x)
+					
+					realx = alvo[0] + offsetx
+					realy = alvo[1] + offsety
+					uav_move(realx, realy, x)
 										
 				else:
-					uav_move(alvo[0], alvo[1], x)
+					realx = alvo[0]
+					realy = alvo[1]
+					uav_move(realx, realy, x)
 					
-				if(auctioned_targets[xi] != 0):
+				final_position = get_points([target_list[index]])[0]	
+				distance = get_distance(realx,realy,final_position[0],final_position[1])
+				#print(distance, [realx,realy], final_position)
+				if(auctioned_targets[xi] != 0 and distance < 20):
 					send_data(target_list[index], index, tick)
 				
 			tock = rospy.get_time()
 			#print(x, str(2*distance/(tock-tick)))
 		else:
-	
+			
 			if distance < limit or (distance > limit and rospy.get_time() - t1 < 10) or len(auctioned_targets_updated) <= 2:
 				#print(distance, rospy.get_time() - t1)
 				for index, alvo in enumerate(final_points):
 					#print(int(alvo[0]), int(alvo[1]))
 					if(prediction == True):				
-						offsetx, offsety = get_offset(target_list, index, tick)
-						uav_move(alvo[0] + offsetx, alvo[1] + offsety, x)
+						offsetx, offsety = get_offset(target_list, index, tick, x)
+						
+						realx = alvo[0] + offsetx
+						realy = alvo[1] + offsety
+						
+						uav_move(realx, realy, x)
 					else:
-						uav_move(alvo[0], alvo[1], x)	
-					if(auctioned_targets[xi] != 0):
+						realx = alvo[0]
+						realy = alvo[1]
+						uav_move(realx, realy, x)	
+						
+					final_position = get_points([target_list[index]])[0]	
+					distance = get_distance(realx,realy,final_position[0],final_position[1])
+					#print(distance, [realx,realy], final_position)
+					if(auctioned_targets[xi] != 0 and distance < 20):
 						send_data(target_list[index], index, tick)
 					
 				tock = rospy.get_time()
@@ -694,13 +731,13 @@ def fly(xi, x, algo, tick, delivery, prediction):
 			else:
 				print('entrou')
 				run_algo = True
-				sem.acquire()
+				#sem.acquire()
 				#print(auctioned_targets[xi])
 				t1 = rospy.get_time()
 				auctioned_targets[xi].remove(last_target)
 				waiting_list.append((last_target, xi))
 				#print(auctioned_targets[xi])
-				sem.release()
+				#sem.release()
 				
 				
 				
@@ -714,10 +751,12 @@ def main():
 	global time_table
 	global auctioned_targets
 	algo = int(sys.argv[1])
-	handover = False
-	prediction = False
-	push = False
+	handover = sys.argv[2].lower() == 'true'
+	prediction = sys.argv[3].lower() == 'true'
+	push = sys.argv[4].lower() == 'true'
+	time = int(sys.argv[5])
 	
+	print(algo, handover, prediction, push)
 
 	
 	uav_dict = dict(zip(uavs, get_points(uavs)))
@@ -763,7 +802,7 @@ def main():
 			print('Flight Over!')
 		
 		
-	rospy.sleep(960)
+	rospy.sleep(time)
 	print('this is the end')
 	
 	
@@ -785,13 +824,19 @@ def main():
 		final_visits.append(visitas)
 		final_time.append(tempo)
 	
-	final_visits_dict = dict(zip(targets, final_visits))	
-	final_time_dict = dict(zip(targets, final_time))	
+	params = ['Algo', 'handover', 'prediction', 'push', time] + targets
+	descr_v = [algo, str(handover), str(prediction), str(push), time] + final_visits
+	descr_t = [algo, str(handover), str(prediction), str(push), time] + final_time
+	
+	final_visits_dict = dict(zip(params, descr_v))	
+	final_time_dict = dict(zip(params, descr_t))	
 	visits_table = visits_table.append(final_visits_dict, ignore_index = True)
 	time_table = time_table.append(final_time_dict, ignore_index = True)
 	
-	visits_table.to_csv('./results/visits'+ str(algo) + '.csv', index = False, mode = 'a', header = False)
-	time_table.to_csv('./results/time' + str(algo) + '.csv', index = False, mode = 'a', header = False)
+	print(visits_table)
+	
+	visits_table.to_csv('./results/visits.csv', index = False, mode = 'a', header = False)
+	time_table.to_csv('./results/time.csv', index = False, mode = 'a', header = False)
 	print('Test Over')
 		
 	

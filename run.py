@@ -30,12 +30,35 @@ from sko.IA import IA_TSP
 import threading
 
 
-for x in range(100):
+for x in range(10):
 	for each in [0,1,2,3]:
 		try:
+		
+			#Handover - Prediction - Variable Speed
 			os.system('clear')
-			print(x, each, datetime.now())
-			os.system('rosrun tcc_pack move.py ' + str(each))
+			print(x, each, datetime.now(), 'scenario 1')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 960')
+			
+			os.system('clear')
+			print(x, each, datetime.now(), 'scenario 2')
+			s.system('rosrun tcc_pack move.py ' + str(each)  + ' False True False 960')
+			
+			os.system('clear')
+			print(x, each, datetime.now(), 'scenario 3')
+			s.system('rosrun tcc_pack move.py ' + str(each)  + ' True False False 960')
+			
+			os.system('clear')
+			print(x, each, datetime.now(), 'scenario 4')
+			s.system('rosrun tcc_pack move.py ' + str(each)  + ' True True False 960')
+			
+			os.system('clear')
+			print(x, each, datetime.now(), 'scenario 5')
+			s.system('rosrun tcc_pack move.py ' + str(each)  + ' True False True 960')
+			
+			os.system('clear')
+			print(x, each, datetime.now(), 'scenario 6')
+			s.system('rosrun tcc_pack move.py ' + str(each)  + ' True True True 960')
+			
 		except:
 			print('terminou')
 

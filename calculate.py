@@ -49,7 +49,7 @@ def calc_values(paths):
 	avg = mean(big_list)
 	
 	std = stdev(big_list)
-	err = 1.96 * std / math.sqrt(len(big_list))
+	err = 1.96 * std / math.sqrt(len(big_list))/avg
 	
 	#print(avg, std, err)
 	
