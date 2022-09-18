@@ -31,13 +31,13 @@ import threading
 
 
 for x in range(10):
-	for each in [0,1,2,3]:
+	for each in [3,2,1,0]:
 		try:
 		
 			#Handover - Prediction - Variable Speed
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 1')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 960')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 30')
 		except:
 			print('terminou')
 			
