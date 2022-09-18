@@ -37,7 +37,7 @@ for x in range(10):
 			#Handover - Prediction - Variable Speed
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 1')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 30')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 960')
 		except:
 			print('terminou')
 			
