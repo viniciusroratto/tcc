@@ -77,7 +77,7 @@ def save_values(df, handover, prediction, variable, test_name):
 def flatten(l):
     return [item for sublist in l for item in sublist]
 
-directory = './results'
+directory = './results/T1'
 dirs = [x[0] for x in os.walk(directory)]
 dirs = [k for k in dirs if 'BAD' not in k]
 #dirs.remove(directory)

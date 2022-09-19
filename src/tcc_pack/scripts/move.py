@@ -709,7 +709,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 				for index, alvo in enumerate(final_points):
 					#print(int(alvo[0]), int(alvo[1]))
 					if(prediction == True):				
-						offsetx, offsety = get_offset(target_list, index, tick, x)
+						offsetx, offsety = get_offset(target_list, index, time, x)
 						
 						realx = alvo[0] + offsetx
 						realy = alvo[1] + offsety
@@ -723,7 +723,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 					final_position = get_points([target_list[index]])[0]	
 					distance = get_distance(realx,realy,final_position[0],final_position[1])
 					#print(distance, [realx,realy], final_position)
-					if(auctioned_targets[xi] != 0 and distance < 20):
+					if(distance < 20):
 						send_data(target_list[index], index, tick)
 					
 				tock = rospy.get_time()
