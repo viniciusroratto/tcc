@@ -31,32 +31,42 @@ from sko.SA import SA_TSP
 from sko.IA import IA_TSP
 import threading
 from statistics import mean, stdev
+import shutil
 
-directory = './results/T2'
+directory = './results/T1_DONE'
 
 
 def calc_values(paths):
 	
 	#print(paths)
+	
+
+	
 	dfs = []
 	for each in paths:
-		dfs.append(pd.read_csv(each, header = None))
+		if (len(pd.read_csv(each, header = None).columns) > 30):
+			filename = each.split('/')[-1]
+			new_path = './results/T2/' + filename
+			print(each, new_path)
+			shutil.move(each, new_path)
+		else:
+			dfs.append(pd.read_csv(each, header = None))
 	final_df = pd.concat(dfs)
 	
 	header = []
-	for index, content in enumerate(range(len(final_df.columns)-6)):
+	for index, content in enumerate(range(len(final_df.columns)-5)):
 		header.append('target_' + str(index))
 		
-	header = header + ['algo', 'handover', 'targets', 'prediction', 'variable', 'time']
+	header = header + ['time', 'algo', 'handover','prediction', 'variable']
 	final_df.columns = header
 	
-	#print(final_df)
+	print(final_df)
 
 	return final_df
 
 	
-def save_values(df, handover, prediction, variable, targets, name):
-	filtered = df[(df['handover'] == handover) & (df['prediction'] == prediction) & (df['variable'] == variable) & (df['targets'] == targets)]
+def save_values(df, handover, prediction, variable,name):
+	filtered = df[(df['handover'] == handover) & (df['prediction'] == prediction) & (df['variable'] == variable)]
 		
 	algo_list = []
 	for each in filtered['algo'].unique():
@@ -79,7 +89,7 @@ def save_values(df, handover, prediction, variable, targets, name):
 			algo_error = 0
 			
 			
-		results_list = [name, targets, each, len(row_averages), "{:.2f}".format(algo_mean), "{:.2f}".format(algo_std), "{:.2f}".format(algo_error)]
+		results_list = [name, each, len(row_averages), "{:.2f}".format(algo_mean), "{:.2f}".format(algo_std), "{:.2f}".format(algo_error)]
 		algo_list.append(results_list)
 	return(algo_list)
 
@@ -89,7 +99,7 @@ def flatten(l):
 
 dirs = [x[0] for x in os.walk(directory)]
 dirs = [k for k in dirs if 'BAD' not in k]
-dirs = [k for k in dirs if 'DONE' not in k]
+#dirs = [k for k in dirs if 'DONE' not in k]
 #dirs.remove(directory)
 dirs.sort()
 #print(dirs)
@@ -124,31 +134,31 @@ for each in dirs:
 	time_values = calc_values(time_paths)
 	
 	#print(test_name, each, len(row_averages), "{:.2f}".format(algo_mean), "{:.2f}".format(algo_std), "{:.2f}".format(algo_error))
-	header = ['Test Name', 'targets', 'Algo', 'Sample Size', 'Average', 'Stdev', '% Err']
+	header = ['Test Name', 'Algo', 'Sample Size', 'Average', 'Stdev', '% Err']
 	value_list = []
 	
-	value_list.append(save_values(visit_values, True, True, False, 20, '20_visits'))
-	value_list.append(save_values(time_values, True, True, False, 20, '20_time'))
+	value_list.append(save_values(visit_values, False, False, False, 'S1-visit'))
+	value_list.append(save_values(time_values, False, False, False, 'S1-time'))
 	
-	value_list.append(save_values(visit_values, True, True, False, 30, '30_visits'))
-	value_list.append(save_values(time_values, True, True, False, 30, '30_time'))
+	value_list.append(save_values(visit_values, False, True, False, 'S2-visit'))
+	value_list.append(save_values(time_values, False, True, False,'S2-time'))
 	
-	value_list.append(save_values(visit_values, True, True, False, 40, '40_visits'))
-	value_list.append(save_values(time_values, True, True, False, 40, '40_time'))
+	value_list.append(save_values(visit_values, True, False, False,'S3-visit'))
+	value_list.append(save_values(time_values, True, False, False, 'S3-time'))
 	
-	value_list.append(save_values(visit_values, True, True, False, 60, '60_visits'))
-	value_list.append(save_values(time_values, True, True, False, 60, '60_time'))
+	value_list.append(save_values(visit_values, True, True, False,'S4-visit'))
+	value_list.append(save_values(time_values, True, True, False, 'S4-time'))
 	
-	value_list.append(save_values(visit_values, True, True, False, 80, '80_visits'))
-	value_list.append(save_values(time_values, True, True, False, 80, '80_time'))
+	value_list.append(save_values(visit_values, True, False, True,'S5-visit'))
+	value_list.append(save_values(time_values, True, False, True, 'S5-time'))
 	
-	value_list.append(save_values(visit_values, True, True, False, 100, '100_visits'))
-	value_list.append(save_values(time_values, True, True, False, 100, '100_time'))
+	value_list.append(save_values(visit_values, True, True, True, 'S6-visit'))
+	value_list.append(save_values(time_values, True, True, True, 'S6-time'))
 	
 	#print(value_list)
 	df = pd.DataFrame(flatten(value_list), columns = header)
 	print(df)
-	df.to_csv('./final_scaling.csv')
+	df.to_csv('./final_Bahavior.csv')
 	
 	
 	
