@@ -8,3 +8,4 @@
 
 # modified environment variables
 export PWD='/home/vini/Desktop/tcc/build'
+export ROS_PACKAGE_PATH='/home/vini/Desktop/tcc/src:/opt/ros/noetic/share'

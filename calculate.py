@@ -32,6 +32,9 @@ from sko.IA import IA_TSP
 import threading
 from statistics import mean, stdev
 
+directory = './results'
+
+
 def calc_values(paths):
 	
 	#print(paths)
@@ -48,6 +51,7 @@ def calc_values(paths):
 	final_df.columns = header
 
 	return final_df
+
 	
 def save_values(df, handover, prediction, variable, test_name):
 	filtered = df[(df['handover'] == handover) & (df['prediction'] == prediction) & (df['variable'] == variable)]
@@ -77,9 +81,10 @@ def save_values(df, handover, prediction, variable, test_name):
 def flatten(l):
     return [item for sublist in l for item in sublist]
 
-directory = './results/T1'
+
 dirs = [x[0] for x in os.walk(directory)]
 dirs = [k for k in dirs if 'BAD' not in k]
+dirs = [k for k in dirs if 'DONE' not in k]
 #dirs.remove(directory)
 dirs.sort()
 #print(dirs)
