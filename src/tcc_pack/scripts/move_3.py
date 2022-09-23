@@ -115,7 +115,10 @@ def general_auction():
 				for yi, y in enumerate(uav_list):	
 					#print(yi, zi)					
 					if yi != zi:
-						values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + 1 + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
+						try:
+							values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + 1 + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
+						except:
+							values.append(0)
 					else:
 						values.append(0)
 				#print(values)

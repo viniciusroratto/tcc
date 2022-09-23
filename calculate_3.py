@@ -32,7 +32,7 @@ from sko.IA import IA_TSP
 import threading
 from statistics import mean, stdev
 
-directory = './results/T2'
+directory = './results/T3'
 
 
 def calc_values(paths):
@@ -89,7 +89,7 @@ def flatten(l):
 
 dirs = [x[0] for x in os.walk(directory)]
 dirs = [k for k in dirs if 'BAD' not in k]
-dirs = [k for k in dirs if 'DONE' not in k]
+#dirs = [k for k in dirs if 'DONE' not in k]
 #dirs.remove(directory)
 dirs.sort()
 #print(dirs)
