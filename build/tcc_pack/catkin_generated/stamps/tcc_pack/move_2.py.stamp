@@ -34,11 +34,16 @@ import sys
 
 
 models = ["UAV_00", "UAV_01", "UAV_02", "UAV_03", "UAV_04",
-          "target_00", "target_01", "target_02", "target_03", "target_04",
-          "target_05", "target_06", "target_07", "target_08", "target_09", "target_10",
-          "target_11", "target_12", "target_13", "target_14", "target_15", "target_16",
-          "target_17", "target_18", "target_19", "target_20", "target_21", "target_22",
-          "target_23", "target_24",
+          "target_00", "target_01", "target_02", "target_03", "target_04", "target_05", "target_06", "target_07", "target_08", "target_09",
+          "target_10", "target_11", "target_12", "target_13", "target_14", "target_15", "target_16", "target_17", "target_18", "target_19", 
+          "target_20", "target_21", "target_22", "target_23", "target_24", "target_25", "target_26", "target_27", "target_28", "target_29",
+          "target_30", "target_31", "target_32", "target_33", "target_34", "target_35", "target_36", "target_37", "target_38", "target_39", 
+          "target_40", "target_41", "target_42", "target_43", "target_44", "target_45", "target_46", "target_47", "target_48", "target_49", 
+          "target_50", "target_51", "target_52", "target_53", "target_54", "target_55", "target_56", "target_57", "target_58", "target_59", 
+          "target_60", "target_61", "target_62", "target_63", "target_64", "target_65", "target_66", "target_67", "target_68", "target_69", 
+          "target_70", "target_71", "target_72", "target_73", "target_74", "target_75", "target_76", "target_77", "target_78", "target_79", 
+          "target_80", "target_81", "target_82", "target_83", "target_84", "target_85", "target_86", "target_87", "target_88", "target_89", 
+          "target_90", "target_91", "target_92", "target_93", "target_94", "target_95", "target_96", "target_97", "target_98", "target_99",
           "box_00", "box_01", "box_02", "box_03", "box_04",
           "box_05", "box_06", "box_07", "box_08", "box_09",
           "box_10", "box_11", "box_12", "box_13", "box_14",
@@ -75,6 +80,8 @@ time_table = pd.DataFrame(columns = targets)
 waiting_list = [] #(target,xi)
 
 sem = threading.Semaphore(1)
+
+internal_time = 0
 
 def general_auction():
 	global sem
@@ -245,6 +252,8 @@ def reset(blocks, boxes, uavs, targets, world_size):
 
 def targets_movement(targets, target_max_speed, world_size, target_z, push):
 	
+	global internal_time
+	
 	try:
 		model_coordinates = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
 	except:
@@ -255,7 +264,7 @@ def targets_movement(targets, target_max_speed, world_size, target_z, push):
 	tick = rospy.get_time()
 	
 	while not rospy.is_shutdown():
-		
+		internal_time = internal_time + 1
 		for each in targets:
 			x = uniform(-target_max_speed, target_max_speed)
 			y = uniform(-target_max_speed, target_max_speed)
@@ -591,7 +600,8 @@ def get_offset(target_list, index, tick, x):
 	dist = get_distance(uav_points[0], uav_points[1], target_points[0], target_points[1])
 	extra_time = dist/20
 
-	tock = rospy.get_time()
+	#tock = rospy.get_time()
+	tock = internal_time
 	offsetx = ((tock-tick) + extra_time) * xv
 	offsety = ((tock-tick) + extra_time) * yv
 	
@@ -625,6 +635,7 @@ def fly(xi, x, algo, tick, delivery, prediction):
 	t1 = rospy.get_time()
 	#r = rospy.Rate(1)
 	limit = 600
+	global internal_time
 			
 	while not rospy.is_shutdown():
 	
@@ -654,7 +665,9 @@ def fly(xi, x, algo, tick, delivery, prediction):
 				
 			run_algo = True
 			
-		time = rospy.get_time()
+		
+		#time = rospy.get_time()
+		time = internal_time
 		
 		target_list = []
 		if (len(auctioned_targets_updated)==0):
@@ -747,6 +760,7 @@ def main():
 
 	#print(sys.argv[0])
 	
+	global targets
 	global visits_table
 	global time_table
 	global auctioned_targets
@@ -755,8 +769,10 @@ def main():
 	prediction = sys.argv[3].lower() == 'true'
 	push = sys.argv[4].lower() == 'true'
 	time = int(sys.argv[5])
+	number_of_targets = int(sys.argv[6])
 	
-	print(algo, handover, prediction, push)
+	
+	#print(algo, handover, prediction, push)
 
 	
 	uav_dict = dict(zip(uavs, get_points(uavs)))
@@ -775,6 +791,7 @@ def main():
 	except:
 		print('Environment Error')
 
+	targets = targets[:number_of_targets]
 	global auctioned_targets 
 	
 	auctioned_targets = first_auction(auctioned_targets)
@@ -824,9 +841,9 @@ def main():
 		final_visits.append(visitas)
 		final_time.append(tempo)
 	
-	params = ['Algo', 'handover', 'prediction', 'push', time] + targets
-	descr_v = [algo, str(handover), str(prediction), str(push), time] + final_visits
-	descr_t = [algo, str(handover), str(prediction), str(push), time] + final_time
+	params = ['Algo', 'handover', 'prediction', 'push', 'time',  'number_of_targets'] + targets
+	descr_v = [algo, str(handover), str(prediction), str(push), time, number_of_targets] + final_visits
+	descr_t = [algo, str(handover), str(prediction), str(push), time, number_of_targets] + final_time
 	
 	final_visits_dict = dict(zip(params, descr_v))	
 	final_time_dict = dict(zip(params, descr_t))	

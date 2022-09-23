@@ -69,6 +69,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/vini/Desktop/tcc/src/tcc_pack/scripts/GA_TSP.py"
   "/home/vini/Desktop/tcc/src/tcc_pack/scripts/move.py"
   "/home/vini/Desktop/tcc/src/tcc_pack/scripts/move_2.py"
+  "/home/vini/Desktop/tcc/src/tcc_pack/scripts/move_3.py"
   "/home/vini/Desktop/tcc/src/tcc_pack/scripts/talker.py"
   "/home/vini/anaconda3/lib/cmake/ZeroMQ/ZeroMQConfig.cmake"
   "/home/vini/anaconda3/lib/cmake/ZeroMQ/ZeroMQConfigVersion.cmake"
