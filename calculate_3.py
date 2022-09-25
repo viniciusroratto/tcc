@@ -127,8 +127,8 @@ for each in dirs:
 	header = ['Test Name', 'targets', 'Algo', 'Sample Size', 'Average', 'Stdev', '% Err']
 	value_list = []
 	
-	value_list.append(save_values(visit_values, True, True, False, 25, 'Final'))
-	value_list.append(save_values(time_values, True, True, False, 25, 'Final'))
+	value_list.append(save_values(visit_values, True, True, False, 25, 'Final_visits'))
+	value_list.append(save_values(time_values, True, True, False, 25, 'Final_time'))
 	
 	
 	#print(value_list)
