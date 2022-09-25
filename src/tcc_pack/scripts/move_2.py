@@ -237,7 +237,7 @@ def reset(blocks, boxes, uavs, targets, world_size):
             y = randint(-world_size, world_size)
             move(each, x, y, 0)
         else:
-            move(each, world_size+100, world_size+100, 0)
+            move(each, world_size+1000, world_size+1000, 0)
         
         
     for each in uavs:
