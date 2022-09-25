@@ -37,21 +37,21 @@ for x in range(10):
 			#Handover - Prediction - Variable Speed
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 1')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 960')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False False False 900')
 		except:
 			print('terminou')
 			
 		try:
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 2')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False True False 960')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' False True False 900')
 		except:
 			print('terminou')
 			
 		try:	
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 3')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True False False 960')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True False False 900')
 						
 		except:
 			print('terminou')
@@ -59,20 +59,20 @@ for x in range(10):
 		try:
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 4')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True True False 960')	
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True True False 900')	
 		except:
 			print('terminou')
 		try:	
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 5')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True False True 960')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True False True 900')
 		except:
 			print('terminou')
 			
 		try:	
 			os.system('clear')
 			print(x, each, datetime.now(), 'scenario 6')
-			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True True True 960')
+			os.system('rosrun tcc_pack move.py ' + str(each)  + ' True True True 900')
 		except:
 			print('terminou')
 
