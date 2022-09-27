@@ -84,7 +84,7 @@ def save_values(df, handover, prediction, variable,name):
 			algo_std = 0
 			
 		try:	
-			algo_error = 1.96 * algo_std / math.sqrt(len(row_averages))/algo_mean
+			algo_error = 1.96 * algo_std / math.sqrt(len(row_averages))
 		except:
 			algo_error = 0
 			
