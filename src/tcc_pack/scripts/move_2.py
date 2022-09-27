@@ -823,8 +823,6 @@ def main():
 	print('this is the end')
 	
 	
-	
-	
 	visitas = 0
 	tempo = 0
 	
