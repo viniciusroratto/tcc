@@ -32,31 +32,30 @@ import threading
 
 for x in range(50):
 	for each in [3,2,1,0]:
-		for spawn in ['a', 'b', 'c', 'd', 'e', 'f']:
-			try:
+		try:
 				#Handover - Prediction - Variable Speed - time - targets
-				print('T4', spawn, each, x)
-				os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 ' + spawn)
+			print('T4', each, x)
+			os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 a')
 				
-				print('T4')
-				os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 ' + spawn)
+			print('T4')
+			os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 b')
 				
-				print('T4')
-				os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 25 '  + spawn)
+			print('T4')
+			os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 25 c')
 				
-				print('T4')
-				os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 ' + spawn)
+			print('T4')
+			os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 d')
 				
-				print('T4')
-				os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 ' + spawn)
+			print('T4')
+			os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 20 e')
 				
 				
-				print('T4')
-				os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 30 ' + spawn)
+			print('T4')
+			os.system('rosrun tcc_pack move_4.py ' + str(each) + ' True True False 900 30 f')
 				
-				os.system('clear')
-			except:
-				print('terminou')
+			os.system('clear')
+		except:
+			print('terminou')
 				
 
 
