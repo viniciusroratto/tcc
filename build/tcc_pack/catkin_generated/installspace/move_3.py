@@ -115,7 +115,10 @@ def general_auction():
 				for yi, y in enumerate(uav_list):	
 					#print(yi, zi)					
 					if yi != zi:
-						values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + 1 + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
+						try:
+							values.append(1 / (target_speed * (math.sqrt(((y[0]-target_list[xi][0])**2) + 1 + (y[1]-target_list[xi][1])**2 ) + 25*(len(auctioned_targets[yi])))))
+						except:
+							values.append(0)
 					else:
 						values.append(0)
 				#print(values)
@@ -237,7 +240,7 @@ def reset(blocks, boxes, uavs, targets, world_size):
             y = randint(-world_size[1], world_size[1])
             move(each, x, y, 0)
         else:
-            move(each, world_size[0] +100, world_size[1] +100, 0)
+            move(each, world_size[0] +1000, world_size[1] +1000, 0)
         
         
     for each in uavs:

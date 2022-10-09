@@ -206,7 +206,7 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-catkin_install_python(PROGRAMS scripts/talker.py scripts/GA_TSP.py scripts/move.py scripts/move_2.py scripts/move_3.py
+catkin_install_python(PROGRAMS scripts/talker.py scripts/GA_TSP.py scripts/move.py scripts/move_2.py scripts/move_3.py scripts/move_4.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

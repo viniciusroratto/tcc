@@ -40,6 +40,7 @@ def calc_values(paths):
 	#print(paths)
 	dfs = []
 	for each in paths:
+		print(each)
 		dfs.append(pd.read_csv(each, header = None))
 	final_df = pd.concat(dfs)
 	

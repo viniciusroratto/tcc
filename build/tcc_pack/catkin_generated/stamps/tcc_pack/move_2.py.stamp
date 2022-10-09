@@ -57,11 +57,11 @@ boxes = list(filter(lambda k: 'box' in k, models))
 world_size = 250
 speeds = []
 
-time_table = pd.DataFrame(columns = targets)
+t_table = pd.DataFrame(columns = targets)
 
 dt = datetime.now()
 ts = datetime.timestamp(dt)
-#time_table.to_csv('./results/distances_' + str(ts) +'.csv', index = False)
+t_table.to_csv('./results/Distances/distances_' + str(ts) +'.csv', index = False)
 
 auctioned_targets = []
 for each in uavs:
@@ -237,7 +237,7 @@ def reset(blocks, boxes, uavs, targets, world_size):
             y = randint(-world_size, world_size)
             move(each, x, y, 0)
         else:
-            move(each, world_size+100, world_size+100, 0)
+            move(each, world_size+1000, world_size+1000, 0)
         
         
     for each in uavs:
@@ -486,7 +486,7 @@ def monitor_distances(targets, uavs, ts):
 			
 		distance_dict = dict(zip(targets, smaller_distances))
 		df = time_table.append(distance_dict, ignore_index = True)
-		df.to_csv('./results/distances_'+ str(ts) + '.csv', mode='a', header=False, index= False )
+		df.to_csv('./results/Distances/distances_'+ str(ts) + '.csv', mode='a', header=False, index= False )
 		tock = rospy.get_time()
 		r.sleep()
 
@@ -787,7 +787,7 @@ def main():
 	try:
 		reset(0, boxes, uavs, targets, world_size)
 		mov_id = _thread.start_new_thread(targets_movement, (targets, target_max_speed,world_size,target_z, push))
-		#_thread.start_new_thread(monitor_distances, (targets, uavs,ts))
+		_thread.start_new_thread(monitor_distances, (targets, uavs,ts))
 	except:
 		print('Environment Error')
 
@@ -823,8 +823,6 @@ def main():
 	print('this is the end')
 	
 	
-	
-	
 	visitas = 0
 	tempo = 0
 	
@@ -852,8 +850,8 @@ def main():
 	
 	print(visits_table)
 	
-	visits_table.to_csv('./results/visits_' + str(ts) + '_.csv', index = False, mode = 'a', header = False)
-	time_table.to_csv('./results/time_' + str(ts) +'_.csv', index = False, mode = 'a', header = False)
+	visits_table.to_csv('./results/T2/visits_' + str(ts) + '_.csv', index = False, mode = 'a', header = False)
+	time_table.to_csv('./results/T2/time_' + str(ts) +'_.csv', index = False, mode = 'a', header = False)
 	print('Test Over')
 		
 	

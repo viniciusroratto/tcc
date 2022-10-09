@@ -60,7 +60,7 @@ def calc_values(paths):
 	header = header + ['time', 'algo', 'handover','prediction', 'variable']
 	final_df.columns = header
 	
-	print(final_df)
+	#print(final_df)
 
 	return final_df
 
@@ -84,7 +84,7 @@ def save_values(df, handover, prediction, variable,name):
 			algo_std = 0
 			
 		try:	
-			algo_error = 1.96 * algo_std / math.sqrt(len(row_averages))
+			algo_error = 1.96 * algo_std / math.sqrt(len(row_averages))/algo_mean
 		except:
 			algo_error = 0
 			

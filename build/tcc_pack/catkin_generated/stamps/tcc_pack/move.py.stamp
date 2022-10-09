@@ -835,8 +835,8 @@ def main():
 	
 	print(visits_table)
 	
-	visits_table.to_csv('./results/visits_' + str(ts) + '_.csv', index = False, mode = 'a', header = False)
-	time_table.to_csv('./results/time_' + str(ts) +'_.csv', index = False, mode = 'a', header = False)
+	visits_table.to_csv('./results/T1_DONE/visits_' + str(ts) + '_.csv', index = False, mode = 'a', header = False)
+	time_table.to_csv('./results/T1_DONE/time_' + str(ts) +'_.csv', index = False, mode = 'a', header = False)
 	print('Test Over')
 		
 	
