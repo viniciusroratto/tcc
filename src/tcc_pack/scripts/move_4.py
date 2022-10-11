@@ -57,11 +57,11 @@ boxes = list(filter(lambda k: 'box' in k, models))
 world_size = [250, 250] 
 speeds = []
 
-time_table = pd.DataFrame(columns = targets)
+time_table = pd.DataFrame(columns = uavs + targets)
 
 dt = datetime.now()
 ts = datetime.timestamp(dt)
-#time_table.to_csv('./results/distances_' + str(ts) +'.csv', index = False)
+time_table.to_csv('./results/positions_' + str(ts) +'.csv', index = False)
 
 auctioned_targets = []
 for each in uavs:
@@ -493,6 +493,23 @@ def monitor_distances(targets, uavs, ts):
 		tock = rospy.get_time()
 		r.sleep()
 
+def monitor_positions(targets, uavs, ts):
+
+	r = rospy.Rate(1)
+
+	while True:
+		tick = rospy.get_time()
+		uav_points = get_points(uavs)
+		targets_points = get_points(targets)
+
+		final_points = uav_points + targets_points
+	
+		distance_dict = dict(zip(uavs + targets, final_points))
+		df = time_table.append(distance_dict, ignore_index = True)
+		df.to_csv('./results/positions_'+ str(ts) + '.csv', mode='a', header=False, index= False )
+		tock = rospy.get_time()
+		r.sleep()
+
 
 def uav_move(goal_x, goal_y, uav):
 
@@ -794,7 +811,7 @@ def main():
 	try:
 		reset(0, boxes, uavs, all_targets, world_size)
 		mov_id = _thread.start_new_thread(targets_movement, (all_targets, target_max_speed,world_size,target_z, push))
-		#_thread.start_new_thread(monitor_distances, (targets, uavs,ts))
+		_thread.start_new_thread(monitor_positions, (targets, uavs,ts))
 	except:
 		print('Environment Error')
 		
